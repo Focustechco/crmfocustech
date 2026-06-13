@@ -41,6 +41,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FocusLogo } from "@/components/focus-logo";
+import pipelineHero from "@/assets/focus-crm-pipeline-hero.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -159,165 +160,23 @@ function Hero() {
 /* ---------------- MOCKUP CRM ---------------- */
 function CRMMockup() {
   return (
-    <div className="relative">
+    <figure className="relative mx-auto w-full max-w-[940px]">
       <div
         aria-hidden
-        className="absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-tr from-primary/10 via-transparent to-primary/5 blur-2xl"
+        className="absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-tr from-primary/15 via-transparent to-primary/5 blur-2xl"
       />
       <div className="overflow-hidden rounded-2xl border bg-card shadow-elevated">
-        {/* Window chrome */}
-        <div className="flex items-center gap-1.5 border-b bg-muted/50 px-4 py-2.5">
-          <span className="h-2.5 w-2.5 rounded-full bg-destructive/60" />
-          <span className="h-2.5 w-2.5 rounded-full bg-warning/60" />
-          <span className="h-2.5 w-2.5 rounded-full bg-success/60" />
-          <span className="ml-3 text-xs text-muted-foreground">app.focuscrm.com.br/pipeline</span>
-        </div>
-
-        <div className="grid grid-cols-12 min-h-[520px]">
-          {/* Sidebar */}
-          <aside className="col-span-3 hidden border-r bg-sidebar p-3 md:block">
-            <div className="mb-4 flex items-center gap-2 px-2">
-              <div className="h-7 w-7 rounded-md brand-gradient" />
-              <span className="text-sm font-semibold">Focus CRM</span>
-            </div>
-            <nav className="space-y-0.5 text-sm">
-              {[
-                [BarChart3, "Dashboard"],
-                [Users, "Clientes"],
-                [KanbanSquare, "Pipeline", true],
-                [Briefcase, "Negociações"],
-                [CheckCircle2, "Tarefas"],
-                [Calendar, "Agenda"],
-                [MessageCircle, "Atendimento"],
-                [FileText, "Contratos"],
-                [Activity, "Relatórios"],
-                [Settings2, "Configurações"],
-              ].map(([Icon, label, active]: any) => (
-                <div
-                  key={label}
-                  className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 ${
-                    active
-                      ? "bg-primary/10 text-primary font-medium"
-                      : "text-muted-foreground hover:bg-accent/40"
-                  }`}
-                >
-                  <Icon className="h-3.5 w-3.5" />
-                  <span className="text-[13px]">{label}</span>
-                </div>
-              ))}
-            </nav>
-          </aside>
-
-          {/* Main */}
-          <main className="col-span-12 md:col-span-9">
-            {/* Topbar */}
-            <div className="flex items-center justify-between border-b px-5 py-3">
-              <div>
-                <div className="text-[11px] text-muted-foreground">Comercial · Q1 2026</div>
-                <div className="font-display text-base font-bold">Pipeline de Vendas</div>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="hidden items-center gap-1.5 rounded-md border bg-background px-2 py-1 text-[11px] text-muted-foreground sm:flex">
-                  <Search className="h-3 w-3" /> Buscar
-                </div>
-                <Bell className="h-4 w-4 text-muted-foreground" />
-                <div className="h-7 w-7 rounded-full brand-gradient text-[10px] font-bold text-white grid place-items-center">FT</div>
-              </div>
-            </div>
-
-            {/* KPI strip */}
-            <div className="grid grid-cols-4 gap-3 border-b p-4">
-              {[
-                ["Oportunidades", "284", "+12%"],
-                ["Receita prevista", "R$ 1,28M", "+8%"],
-                ["Taxa conversão", "32%", "+3pp"],
-                ["Tarefas hoje", "47", "—"],
-              ].map(([l, v, d]) => (
-                <div key={l} className="rounded-lg border bg-background p-2.5">
-                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{l}</div>
-                  <div className="mt-0.5 flex items-baseline gap-1.5">
-                    <div className="font-display text-base font-bold">{v}</div>
-                    <div className="text-[10px] font-medium text-success">{d}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Kanban */}
-            <div className="grid grid-cols-4 gap-3 p-4">
-              {KANBAN_STAGES.map((stage) => (
-                <div key={stage.name} className="rounded-lg bg-muted/40 p-2">
-                  <div className="mb-2 flex items-center justify-between px-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className={`h-1.5 w-1.5 rounded-full ${stage.dot}`} />
-                      <span className="text-[11px] font-semibold">{stage.name}</span>
-                    </div>
-                    <span className="text-[10px] text-muted-foreground">{stage.cards.length}</span>
-                  </div>
-                  <div className="space-y-1.5">
-                    {stage.cards.map((c) => (
-                      <DealCard key={c.title} {...c} />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </main>
-        </div>
+        <img
+          src={pipelineHero.url}
+          alt="Interface do Focus CRM com indicadores comerciais e pipeline de vendas em Kanban"
+          width={1536}
+          height={1024}
+          fetchPriority="high"
+          decoding="async"
+          className="block h-auto w-full object-contain"
+        />
       </div>
-    </div>
-  );
-}
-
-const KANBAN_STAGES = [
-  {
-    name: "Lead",
-    dot: "bg-chart-2",
-    cards: [
-      { title: "Construtora Vega", value: "R$ 84.000", owner: "MR" },
-      { title: "Clínica Vitalis", value: "R$ 22.500", owner: "JS" },
-    ],
-  },
-  {
-    name: "Contato",
-    dot: "bg-warning",
-    cards: [
-      { title: "Imob. Marítima", value: "R$ 156.000", owner: "AL" },
-      { title: "Indústria Norte", value: "R$ 312.000", owner: "MR" },
-      { title: "Studio Arq+", value: "R$ 48.000", owner: "PT" },
-    ],
-  },
-  {
-    name: "Proposta",
-    dot: "bg-primary",
-    cards: [
-      { title: "Logística Alfa", value: "R$ 240.000", owner: "JS" },
-      { title: "Distribuidora Sul", value: "R$ 98.000", owner: "AL" },
-    ],
-  },
-  {
-    name: "Fechamento",
-    dot: "bg-success",
-    cards: [
-      { title: "Grupo Helvetia", value: "R$ 420.000", owner: "MR" },
-    ],
-  },
-];
-
-function DealCard({ title, value, owner }: { title: string; value: string; owner: string }) {
-  return (
-    <div className="rounded-md border bg-background p-2 shadow-card">
-      <div className="text-[11px] font-medium text-foreground line-clamp-1">{title}</div>
-      <div className="mt-0.5 text-[10px] text-muted-foreground">{value}</div>
-      <div className="mt-1.5 flex items-center justify-between">
-        <div className="flex -space-x-1">
-          <div className="h-4 w-4 rounded-full bg-secondary text-[8px] font-bold grid place-items-center border border-card">{owner}</div>
-        </div>
-        <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
-          <Clock className="h-2.5 w-2.5" /> 2d
-        </div>
-      </div>
-    </div>
+    </figure>
   );
 }
 
