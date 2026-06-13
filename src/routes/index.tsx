@@ -102,7 +102,7 @@ function Nav() {
         </nav>
         <div className="flex items-center gap-2">
           <Button asChild variant="ghost" size="sm"><Link to="/auth">Entrar</Link></Button>
-          <Button asChild size="sm" className="brand-gradient text-white hover:opacity-90">
+          <Button asChild size="sm" className="hidden brand-gradient text-white hover:opacity-90 md:inline-flex">
             <a href="#cta">Solicitar Demo <ArrowRight className="ml-1 h-4 w-4" /></a>
           </Button>
         </div>
