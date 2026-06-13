@@ -189,8 +189,8 @@ function TrustBar() {
     { name: "Telegram", slug: "telegram", color: "26A5E4" },
     { name: "Gmail", slug: "gmail", color: "EA4335" },
     { name: "Outlook", slug: "maildotru", color: "0078D4" },
-    { name: "Slack", slug: "slack", color: "4A154B" },
-    { name: "Microsoft Teams", slug: "microsoftteams", color: "6264A7" },
+    { name: "Slack", slug: "slack", color: "4A154B", fallback: MessageCircle },
+    { name: "Microsoft Teams", slug: "microsoftteams", color: "6264A7", fallback: Users },
   ];
   return (
     <section className="border-b bg-muted/30 py-12">
@@ -205,12 +205,16 @@ function TrustBar() {
               title={c.name}
               className="flex flex-col items-center gap-2 transition-transform hover:scale-110"
             >
-              <img
-                src={`https://cdn.simpleicons.org/${c.slug}/${c.color}`}
-                alt={c.name}
-                loading="lazy"
-                className="h-9 w-9 object-contain"
-              />
+              {c.fallback ? (
+                <c.fallback aria-label={c.name} className="h-9 w-9 text-primary" strokeWidth={1.8} />
+              ) : (
+                <img
+                  src={`https://cdn.simpleicons.org/${c.slug}/${c.color}`}
+                  alt={c.name}
+                  loading="lazy"
+                  className="h-9 w-9 object-contain"
+                />
+              )}
               <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                 {c.name}
               </span>
