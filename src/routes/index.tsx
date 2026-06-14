@@ -42,6 +42,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { FocusLogo } from "@/components/focus-logo";
 import pipelineHero from "@/assets/focus-crm-pipeline-hero.png.asset.json";
+import ecosystemIcon from "@/assets/focus-ecosystem-icon.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -721,12 +722,13 @@ function EcosystemSection() {
           <div className="relative grid h-[420px] w-full place-items-center">
             <div className="absolute h-72 w-72 rounded-full border border-dashed border-primary/30" />
             <div className="absolute h-[420px] w-[420px] rounded-full border border-dashed border-primary/20" />
-            <div className="z-10 grid h-36 w-36 place-items-center rounded-full brand-gradient text-center text-white shadow-elevated">
-              <div>
-                <div className="font-display text-lg font-bold">FOCUS</div>
-                <div className="font-display text-base font-bold">CRM</div>
-              </div>
-            </div>
+            <img
+              src={ecosystemIcon.url}
+              alt="Símbolo Focus"
+              width={144}
+              height={144}
+              className="z-10 h-36 w-36 object-contain"
+            />
             {modules.map((m, i) => {
               const angle = (i / modules.length) * Math.PI * 2 - Math.PI / 2;
               const r = 180;
