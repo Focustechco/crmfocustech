@@ -676,8 +676,11 @@ function DashboardSection() {
               </div>
               <div className="flex h-44 items-end gap-2">
                 {[42, 58, 65, 72, 68, 84, 91, 78, 88, 95, 82, 100].map((h, i) => (
-                  <div key={i} className="flex flex-1 flex-col items-center gap-1">
-                    <div className="w-full rounded-t brand-gradient" style={{ height: `${h}%` }} />
+                  <div key={i} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
+                    <div
+                      className="w-full rounded-t bg-success"
+                      style={{ height: `calc(${h}% - 14px)` }}
+                    />
                     <span className="text-[9px] text-muted-foreground">
                       {["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"][i]}
                     </span>
