@@ -43,6 +43,10 @@ import { Button } from "@/components/ui/button";
 import { FocusLogo } from "@/components/focus-logo";
 import pipelineHero from "@/assets/focus-crm-pipeline-hero.png.asset.json";
 import ecosystemIcon from "@/assets/focus-ecosystem-icon.png.asset.json";
+import marianaPhoto from "@/assets/mariana-rocha.jpg.asset.json";
+import joaoPhoto from "@/assets/joao-silva.jpg.asset.json";
+import anaPhoto from "@/assets/ana-lima.jpg.asset.json";
+import pedroPhoto from "@/assets/pedro-tavares.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -472,17 +476,23 @@ function TeamSection() {
             </div>
             <div className="space-y-3">
               {[
-                { n: "Mariana Rocha", r: "Comercial Sr.", m: 92, v: "R$ 384k" },
-                { n: "João Silva", r: "Comercial", m: 78, v: "R$ 256k" },
-                { n: "Ana Lima", r: "Atendimento", m: 88, v: "1.240 tickets" },
-                { n: "Pedro Tavares", r: "Pré-vendas", m: 65, v: "R$ 184k" },
+                { n: "Mariana Rocha", r: "SDR", m: 92, v: "R$ 384k", photo: marianaPhoto.url },
+                { n: "João Silva", r: "Comercial", m: 78, v: "R$ 256k", photo: joaoPhoto.url },
+                { n: "Ana Lima", r: "Atendimento", m: 88, v: "1.240 tickets", photo: anaPhoto.url },
+                { n: "Pedro Tavares", r: "Pré-vendas", m: 65, v: "R$ 184k", photo: pedroPhoto.url },
               ].map((p) => (
                 <div key={p.n} className="rounded-lg border bg-background p-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="grid h-8 w-8 place-items-center rounded-full bg-accent text-xs font-bold text-primary">
-                        {p.n.split(" ").map((s) => s[0]).join("").slice(0,2)}
-                      </div>
+                      <img
+                        src={p.photo}
+                        alt={`Foto de ${p.n}`}
+                        width={32}
+                        height={32}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-8 w-8 rounded-full object-cover"
+                      />
                       <div>
                         <div className="text-sm font-semibold">{p.n}</div>
                         <div className="text-[11px] text-muted-foreground">{p.r}</div>
