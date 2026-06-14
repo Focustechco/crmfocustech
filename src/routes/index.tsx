@@ -682,7 +682,7 @@ function DashboardSection() {
                       style={{ height: `calc(${h}% - 14px)` }}
                     />
                     <span className="text-[9px] text-muted-foreground">
-                      {["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"][i]}
+                      {["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"][i]}
                     </span>
                   </div>
                 ))}
