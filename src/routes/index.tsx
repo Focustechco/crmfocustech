@@ -824,19 +824,11 @@ function MobileSection() {
           </ul>
         </div>
         <div className="relative grid place-items-center">
-          <div className="flex gap-4">
+          <div className="flex gap-6">
             {[0, 1].map((idx) => (
-              <div
-                key={idx}
-                className={`w-52 overflow-hidden rounded-[2.5rem] border-[6px] border-foreground/90 bg-card shadow-elevated ${
-                  idx === 1 ? "translate-y-6" : "-translate-y-2"
-                }`}
-              >
-                <div className="mx-auto mt-1 h-4 w-16 rounded-full bg-foreground/90" />
-                <div className="p-3">
-                  {idx === 0 ? <MobilePipelinePreview /> : <MobileClientPreview />}
-                </div>
-              </div>
+              <PhoneFrame key={idx} className={idx === 1 ? "translate-y-8" : "-translate-y-2"}>
+                {idx === 0 ? <MobilePipelinePreview /> : <MobileClientPreview />}
+              </PhoneFrame>
             ))}
           </div>
         </div>
