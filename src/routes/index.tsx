@@ -842,28 +842,31 @@ function PhoneFrame({ children, className = "" }: { children: React.ReactNode; c
   return (
     <div className={`relative ${className}`}>
       {/* side buttons */}
-      <div className="absolute -left-[3px] top-20 h-8 w-[3px] rounded-l bg-foreground/80" />
-      <div className="absolute -left-[3px] top-32 h-12 w-[3px] rounded-l bg-foreground/80" />
-      <div className="absolute -left-[3px] top-48 h-12 w-[3px] rounded-l bg-foreground/80" />
-      <div className="absolute -right-[3px] top-28 h-16 w-[3px] rounded-r bg-foreground/80" />
-      {/* frame */}
-      <div className="relative w-56 rounded-[2.75rem] bg-foreground/95 p-[3px] shadow-elevated ring-1 ring-foreground/40">
-        <div className="rounded-[2.55rem] bg-foreground/95 p-[10px]">
-          <div className="relative overflow-hidden rounded-[2rem] bg-card">
+      <div className="absolute -left-[2px] top-24 h-7 w-[3px] rounded-l-sm bg-zinc-700" />
+      <div className="absolute -left-[2px] top-36 h-12 w-[3px] rounded-l-sm bg-zinc-700" />
+      <div className="absolute -left-[2px] top-52 h-12 w-[3px] rounded-l-sm bg-zinc-700" />
+      <div className="absolute -right-[2px] top-32 h-16 w-[3px] rounded-r-sm bg-zinc-700" />
+      {/* outer titanium frame */}
+      <div className="relative w-[232px] rounded-[2.75rem] bg-gradient-to-b from-zinc-700 via-zinc-900 to-zinc-800 p-[3px] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.45),0_0_0_1px_rgba(255,255,255,0.05)_inset]">
+        {/* inner bezel */}
+        <div className="rounded-[2.6rem] bg-black p-[8px]">
+          {/* screen */}
+          <div className="relative aspect-[9/19.5] overflow-hidden rounded-[2.1rem] bg-card">
             {/* dynamic island */}
-            <div className="pointer-events-none absolute left-1/2 top-2 z-10 h-5 w-20 -translate-x-1/2 rounded-full bg-foreground/95" />
+            <div className="pointer-events-none absolute left-1/2 top-2 z-20 h-[22px] w-[78px] -translate-x-1/2 rounded-full bg-black" />
             {/* status bar */}
-            <div className="flex items-center justify-between px-5 pt-2 text-[9px] font-semibold text-foreground/80">
+            <div className="relative z-10 flex items-center justify-between px-5 pt-[10px] text-[9px] font-semibold text-foreground">
               <span>9:41</span>
               <span className="opacity-0">·</span>
             </div>
-            <div className="px-3 pb-4 pt-4">{children}</div>
+            <div className="px-3 pb-4 pt-3">{children}</div>
           </div>
         </div>
       </div>
     </div>
   );
 }
+
 
 function MobilePipelinePreview() {
   return (
