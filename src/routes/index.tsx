@@ -837,6 +837,34 @@ function MobileSection() {
   );
 }
 
+
+function PhoneFrame({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={`relative ${className}`}>
+      {/* side buttons */}
+      <div className="absolute -left-[3px] top-20 h-8 w-[3px] rounded-l bg-foreground/80" />
+      <div className="absolute -left-[3px] top-32 h-12 w-[3px] rounded-l bg-foreground/80" />
+      <div className="absolute -left-[3px] top-48 h-12 w-[3px] rounded-l bg-foreground/80" />
+      <div className="absolute -right-[3px] top-28 h-16 w-[3px] rounded-r bg-foreground/80" />
+      {/* frame */}
+      <div className="relative w-56 rounded-[2.75rem] bg-foreground/95 p-[3px] shadow-elevated ring-1 ring-foreground/40">
+        <div className="rounded-[2.55rem] bg-foreground/95 p-[10px]">
+          <div className="relative overflow-hidden rounded-[2rem] bg-card">
+            {/* dynamic island */}
+            <div className="pointer-events-none absolute left-1/2 top-2 z-10 h-5 w-20 -translate-x-1/2 rounded-full bg-foreground/95" />
+            {/* status bar */}
+            <div className="flex items-center justify-between px-5 pt-2 text-[9px] font-semibold text-foreground/80">
+              <span>9:41</span>
+              <span className="opacity-0">·</span>
+            </div>
+            <div className="px-3 pb-4 pt-4">{children}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function MobilePipelinePreview() {
   return (
     <div className="space-y-2">
