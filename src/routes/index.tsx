@@ -269,14 +269,6 @@ function PlatformOverview() {
 
 /* ---------------- PIPELINE SECTION ---------------- */
 function PipelineSection() {
-  const stages = [
-    { name: "Lead", count: 42, value: "R$ 386k", color: "bg-chart-2" },
-    { name: "Contato", count: 28, value: "R$ 612k", color: "bg-warning" },
-    { name: "Proposta", count: 19, value: "R$ 894k", color: "bg-primary" },
-    { name: "Negociação", count: 12, value: "R$ 1.1M", color: "bg-chart-5" },
-    { name: "Fechamento", count: 8, value: "R$ 520k", color: "bg-success" },
-    { name: "Cliente ativo", count: 156, value: "R$ 4.2M", color: "bg-chart-3" },
-  ];
   return (
     <section id="pipeline" className="border-b bg-muted/30 py-24">
       <div className="mx-auto max-w-7xl px-6">
