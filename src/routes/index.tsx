@@ -47,6 +47,7 @@ import marianaPhoto from "@/assets/mariana-rocha.jpg.asset.json";
 import joaoPhoto from "@/assets/joao-silva.jpg.asset.json";
 import anaPhoto from "@/assets/ana-lima.jpg.asset.json";
 import pedroPhoto from "@/assets/pedro-tavares.jpg.asset.json";
+import pipelineMockup from "@/assets/pipeline-mockup.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -268,14 +269,6 @@ function PlatformOverview() {
 
 /* ---------------- PIPELINE SECTION ---------------- */
 function PipelineSection() {
-  const stages = [
-    { name: "Lead", count: 42, value: "R$ 386k", color: "bg-chart-2" },
-    { name: "Contato", count: 28, value: "R$ 612k", color: "bg-warning" },
-    { name: "Proposta", count: 19, value: "R$ 894k", color: "bg-primary" },
-    { name: "Negociação", count: 12, value: "R$ 1.1M", color: "bg-chart-5" },
-    { name: "Fechamento", count: 8, value: "R$ 520k", color: "bg-success" },
-    { name: "Cliente ativo", count: 156, value: "R$ 4.2M", color: "bg-chart-3" },
-  ];
   return (
     <section id="pipeline" className="border-b bg-muted/30 py-24">
       <div className="mx-auto max-w-7xl px-6">
@@ -304,44 +297,12 @@ function PipelineSection() {
           </div>
           <div className="lg:col-span-8">
             <div className="overflow-hidden rounded-2xl border bg-card shadow-elevated">
-              <div className="flex items-center justify-between border-b bg-muted/40 px-4 py-2.5">
-                <div className="text-xs font-medium">Pipeline comercial · Janeiro 2026</div>
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Plus className="h-3 w-3" /> Nova oportunidade
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-3 p-4 md:grid-cols-6">
-                {stages.map((s) => (
-                  <div key={s.name} className="rounded-lg border bg-background p-3">
-                    <div className="mb-2 flex items-center gap-1.5">
-                      <span className={`h-1.5 w-1.5 rounded-full ${s.color}`} />
-                      <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{s.name}</span>
-                    </div>
-                    <div className="font-display text-lg font-bold">{s.count}</div>
-                    <div className="text-[11px] text-muted-foreground">{s.value}</div>
-                    <div className="mt-2.5 space-y-1">
-                      {Array.from({ length: 3 }).map((_, i) => (
-                        <div key={i} className="space-y-1 rounded bg-muted/60 p-1.5">
-                          <div className="h-1.5 w-3/4 rounded bg-foreground/15" />
-                          <div className="h-1.5 w-1/2 rounded bg-foreground/10" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="grid grid-cols-3 gap-4 border-t bg-muted/30 p-4">
-                {[
-                  ["Receita prevista", "R$ 7.7M"],
-                  ["Conversão média", "32%"],
-                  ["Ticket médio", "R$ 38k"],
-                ].map(([l, v]) => (
-                  <div key={l}>
-                    <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{l}</div>
-                    <div className="font-display text-base font-bold">{v}</div>
-                  </div>
-                ))}
-              </div>
+              <img
+                src={pipelineMockup.url}
+                alt="Pipeline comercial do Focus CRM mostrando etapas de Lead, Contato, Proposta, Negociação, Fechamento e Cliente Ativo com valores e oportunidades"
+                className="h-auto w-full"
+                loading="lazy"
+              />
             </div>
           </div>
         </div>
