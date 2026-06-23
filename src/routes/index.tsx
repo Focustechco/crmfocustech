@@ -296,11 +296,13 @@ function PipelineSection() {
             </ul>
           </div>
           <div className="lg:col-span-8">
-            <div className="overflow-hidden rounded-2xl border bg-card shadow-elevated">
+            <div className="flex justify-center overflow-hidden rounded-2xl border bg-card shadow-elevated">
               <img
                 src={pipelineMockup.url}
                 alt="Pipeline comercial do Focus CRM mostrando etapas de Lead, Contato, Proposta, Negociação, Fechamento e Cliente Ativo com valores e oportunidades"
-                className="h-auto w-full"
+                width={475}
+                height={206}
+                className="h-auto max-w-[475px]"
                 loading="lazy"
               />
             </div>
