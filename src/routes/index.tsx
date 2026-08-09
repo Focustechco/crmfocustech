@@ -562,12 +562,10 @@ function AutomationSection() {
   const steps = [
     { i: Users, t: "Novo Lead" },
     { i: Workflow, t: "Distribuição automática" },
-    { i: CheckCircle2, t: "Criação de tarefa" },
     { i: Calendar, t: "Follow-up agendado" },
     { i: FileText, t: "Envio de proposta" },
     { i: Target, t: "Fechamento" },
-    { i: Users, t: "Cliente ativo" },
-    { i: BarChart3, t: "Dashboard atualizado" },
+
   ];
   return (
     <section className="border-b bg-muted/30 py-24">
