@@ -47,7 +47,7 @@ import marianaPhoto from "@/assets/mariana-rocha.jpg.asset.json";
 import joaoPhoto from "@/assets/joao-silva.jpg.asset.json";
 import anaPhoto from "@/assets/ana-lima.jpg.asset.json";
 import pedroPhoto from "@/assets/pedro-tavares.jpg.asset.json";
-import pipelineMockup from "@/assets/pipeline-mockup-2x.png.asset.json";
+import pipelineMockup from "@/assets/pipeline-board.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
