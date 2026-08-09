@@ -575,8 +575,9 @@ function AutomationSection() {
           title="Padronize processos com fluxos visuais"
           desc="Crie automações sem código que conectam pipeline, atendimento, equipe e dashboards."
         />
-        <div className="mt-14 overflow-x-auto">
-          <div className="mx-auto flex min-w-max items-center justify-center gap-2 px-4 lg:px-0">
+        <div className="mt-14">
+          <div className="mx-auto flex flex-wrap items-center justify-center gap-2 px-4 lg:px-0">
+
             {steps.map((s, i) => (
               <div key={s.t} className="flex items-center gap-2">
                 <div className="flex w-36 flex-col items-center rounded-xl border bg-card p-3 text-center shadow-card">
