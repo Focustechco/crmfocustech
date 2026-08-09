@@ -300,10 +300,11 @@ function PipelineSection() {
               <img
                 src={pipelineMockup.url}
                 alt="Pipeline comercial do Focus CRM mostrando etapas de Lead, Contato, Proposta, Negociação, Fechamento e Cliente Ativo com valores e oportunidades"
-                width={1425}
-                height={618}
-                className="w-full rounded-xl object-cover object-top"
+                width={1846}
+                height={724}
+                className="h-auto w-full rounded-xl"
                 loading="lazy"
+
               />
             </div>
           </div>
