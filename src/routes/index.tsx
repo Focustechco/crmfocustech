@@ -47,7 +47,7 @@ import marianaPhoto from "@/assets/mariana-rocha.jpg.asset.json";
 import joaoPhoto from "@/assets/joao-silva.jpg.asset.json";
 import anaPhoto from "@/assets/ana-lima.jpg.asset.json";
 import pedroPhoto from "@/assets/pedro-tavares.jpg.asset.json";
-import pipelineMockup from "@/assets/pipeline-mockup-2x.png.asset.json";
+import pipelineMockup from "@/assets/pipeline-board.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -300,10 +300,11 @@ function PipelineSection() {
               <img
                 src={pipelineMockup.url}
                 alt="Pipeline comercial do Focus CRM mostrando etapas de Lead, Contato, Proposta, Negociação, Fechamento e Cliente Ativo com valores e oportunidades"
-                width={1425}
-                height={618}
-                className="w-full rounded-xl object-cover object-top"
+                width={1846}
+                height={724}
+                className="h-auto w-full rounded-xl"
                 loading="lazy"
+
               />
             </div>
           </div>
