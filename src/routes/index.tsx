@@ -42,6 +42,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { FocusLogo } from "@/components/focus-logo";
 import pipelineHero from "@/assets/focus-crm-pipeline-hero.png.asset.json";
+import industryLogo from "@/assets/industry-logo.png.asset.json";
 
 import marianaPhoto from "@/assets/mariana-rocha.jpg.asset.json";
 import joaoPhoto from "@/assets/joao-silva.jpg.asset.json";
