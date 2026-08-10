@@ -42,6 +42,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { FocusLogo } from "@/components/focus-logo";
 import pipelineHero from "@/assets/focus-crm-pipeline-hero.png.asset.json";
+import industryLogo from "@/assets/industry-logo.png.asset.json";
 
 import marianaPhoto from "@/assets/mariana-rocha.jpg.asset.json";
 import joaoPhoto from "@/assets/joao-silva.jpg.asset.json";
@@ -362,7 +363,9 @@ function ClientMockup() {
       <div className="grid grid-cols-12 gap-0">
         <div className="col-span-4 border-r p-5">
           <div className="flex items-center gap-3">
-            <div className="grid h-12 w-12 place-items-center rounded-xl brand-gradient text-white font-bold">GH</div>
+            <div className="grid h-12 w-12 place-items-center overflow-hidden rounded-xl border bg-card">
+              <img src={industryLogo.url} alt="Logo Grupo Helvetia" loading="lazy" width={48} height={48} className="h-9 w-9 object-contain" />
+            </div>
             <div>
               <div className="font-display text-base font-bold">Grupo Helvetia</div>
               <div className="text-xs text-muted-foreground">Indústria · 250+ colaboradores</div>
