@@ -42,7 +42,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { FocusLogo } from "@/components/focus-logo";
 import pipelineHero from "@/assets/focus-crm-pipeline-hero.png.asset.json";
-import ecosystemIcon from "@/assets/focus-ecosystem-icon.png.asset.json";
+
 import marianaPhoto from "@/assets/mariana-rocha.jpg.asset.json";
 import joaoPhoto from "@/assets/joao-silva.jpg.asset.json";
 import anaPhoto from "@/assets/ana-lima.jpg.asset.json";
@@ -82,7 +82,7 @@ function LandingPage() {
       <OmnichannelSection />
       <AutomationSection />
       <DashboardSection />
-      <EcosystemSection />
+      
       <ImplementationSection />
       <MobileSection />
       <ResultsSection />
@@ -103,7 +103,7 @@ function Nav() {
         <nav className="hidden items-center gap-8 md:flex">
           <a href="#plataforma" className="text-sm text-muted-foreground hover:text-foreground">Plataforma</a>
           <a href="#pipeline" className="text-sm text-muted-foreground hover:text-foreground">Pipeline</a>
-          <a href="#ecossistema" className="text-sm text-muted-foreground hover:text-foreground">Ecossistema</a>
+          
           <a href="#planos" className="text-sm text-muted-foreground hover:text-foreground">Planos</a>
         </nav>
         <div className="flex items-center gap-2">
@@ -684,52 +684,6 @@ function DashboardSection() {
   );
 }
 
-/* ---------------- ECOSYSTEM ---------------- */
-function EcosystemSection() {
-  const modules = ["Focus ERP", "Focus BI", "Focus Finance", "Focus Log", "Focus E-commerce", "Focus Suporte"];
-  return (
-    <section id="ecossistema" className="border-b bg-muted/30 py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        <SectionHead
-          eyebrow="Ecossistema Focus"
-          title="Integrado com toda a operação da sua empresa"
-          desc="O Focus CRM se conecta nativamente ao restante do ecossistema, do pedido à entrega."
-        />
-        <div className="relative mx-auto mt-16 grid max-w-3xl place-items-center">
-          <div className="relative grid h-[420px] w-full place-items-center">
-            <div className="absolute h-72 w-72 rounded-full border border-dashed border-primary/30" />
-            <div className="absolute h-[420px] w-[420px] rounded-full border border-dashed border-primary/20" />
-            <img
-              src={ecosystemIcon.url}
-              alt="Símbolo Focus"
-              width={144}
-              height={144}
-              className="z-10 h-36 w-36 object-contain"
-            />
-            {modules.map((m, i) => {
-              const angle = (i / modules.length) * Math.PI * 2 - Math.PI / 2;
-              const r = 180;
-              const x = Math.cos(angle) * r;
-              const y = Math.sin(angle) * r;
-              return (
-                <div
-                  key={m}
-                  className="absolute rounded-xl border bg-card px-3 py-2 text-xs font-semibold shadow-card"
-                  style={{ transform: `translate(${x}px, ${y}px)` }}
-                >
-                  {m}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-        <p className="mx-auto mt-4 max-w-xl text-center text-sm text-muted-foreground">
-          CRM envia vendas → ERP recebe pedidos → Finance gera cobranças → BI gera indicadores → Log acompanha entregas.
-        </p>
-      </div>
-    </section>
-  );
-}
 
 /* ---------------- IMPLEMENTATION ---------------- */
 function ImplementationSection() {
