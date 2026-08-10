@@ -772,15 +772,37 @@ function PhoneFrame({ children, className = "" }: { children: React.ReactNode; c
         {/* inner bezel */}
         <div className="rounded-[2.6rem] bg-black p-[8px]">
           {/* screen */}
-          <div className="relative aspect-[9/19.5] overflow-hidden rounded-[2.1rem] bg-card">
+          <div className="relative flex aspect-[9/19.5] flex-col overflow-hidden rounded-[2.1rem] bg-card">
             {/* dynamic island */}
             <div className="pointer-events-none absolute left-1/2 top-2 z-20 h-[22px] w-[78px] -translate-x-1/2 rounded-full bg-black" />
             {/* status bar */}
-            <div className="relative z-10 flex items-center justify-between px-5 pt-[10px] text-[9px] font-semibold text-foreground">
+            <div className="relative z-10 flex shrink-0 items-center justify-between px-5 pt-[10px] text-[9px] font-semibold text-foreground">
               <span>9:41</span>
-              <span className="opacity-0">·</span>
+              <span className="flex items-center gap-[3px]">
+                <span className="flex items-end gap-[1px]">
+                  <span className="h-[3px] w-[2px] rounded-sm bg-foreground/70" />
+                  <span className="h-[5px] w-[2px] rounded-sm bg-foreground/70" />
+                  <span className="h-[7px] w-[2px] rounded-sm bg-foreground" />
+                  <span className="h-[9px] w-[2px] rounded-sm bg-foreground" />
+                </span>
+                <span className="ml-[2px] flex h-[8px] w-[15px] items-center rounded-[3px] border border-foreground/60 p-[1px]">
+                  <span className="h-full w-[70%] rounded-[1px] bg-foreground" />
+                </span>
+              </span>
             </div>
-            <div className="px-3 pb-4 pt-3">{children}</div>
+            <div className="min-h-0 flex-1 overflow-hidden px-3 pt-3">{children}</div>
+            {/* bottom tab bar */}
+            <div className="shrink-0 border-t bg-card/80 px-3 pb-3 pt-2 backdrop-blur">
+              <div className="flex items-center justify-between">
+                {[KanbanSquare, Users, Calendar, BarChart3].map((Icon, i) => (
+                  <div key={i} className="flex flex-1 flex-col items-center gap-[3px]">
+                    <Icon className={`h-3.5 w-3.5 ${i === 0 ? "text-primary" : "text-muted-foreground"}`} />
+                    <span className={`h-[3px] w-[3px] rounded-full ${i === 0 ? "bg-primary" : "bg-transparent"}`} />
+                  </div>
+                ))}
+              </div>
+              <div className="mx-auto mt-1 h-[3px] w-16 rounded-full bg-foreground/25" />
+            </div>
           </div>
         </div>
       </div>
