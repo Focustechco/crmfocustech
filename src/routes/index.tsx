@@ -812,21 +812,66 @@ function PhoneFrame({ children, className = "" }: { children: React.ReactNode; c
 
 
 function MobilePipelinePreview() {
+  const cards = [
+    { n: "Grupo Helvetia", v: "R$ 420k", d: "Hoje · 14h", ini: "GH", p: 80, tag: "Quente" },
+    { n: "Logística Alfa", v: "R$ 240k", d: "Amanhã", ini: "LA", p: 55, tag: "Morno" },
+    { n: "Distrib. Sul", v: "R$ 98k", d: "12 ago", ini: "DS", p: 35, tag: "Novo" },
+  ];
   return (
     <div className="space-y-2">
-      <div className="text-xs font-bold">Pipeline</div>
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-[11px] font-bold leading-tight">Pipeline</div>
+          <div className="text-[8px] text-muted-foreground">R$ 1,2M em aberto</div>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="grid h-5 w-5 place-items-center rounded-full bg-muted"><Search className="h-2.5 w-2.5 text-muted-foreground" /></div>
+          <div className="relative grid h-5 w-5 place-items-center rounded-full bg-muted">
+            <Bell className="h-2.5 w-2.5 text-muted-foreground" />
+            <span className="absolute right-[3px] top-[3px] h-1 w-1 rounded-full bg-primary" />
+          </div>
+        </div>
+      </div>
+      <div className="flex gap-1">
+        {[["Proposta", true], ["Contato", false], ["Negoc.", false]].map(([t, a]) => (
+          <span key={t as string} className={`rounded-full px-2 py-[3px] text-[8px] font-semibold ${a ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{t as string}</span>
+        ))}
+      </div>
       <div className="rounded-lg bg-muted p-2">
-        <div className="text-[10px] font-semibold uppercase text-muted-foreground">Proposta · 8</div>
+        <div className="flex items-center justify-between">
+          <span className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">Proposta · 8</span>
+          <span className="text-[9px] font-bold text-primary">R$ 758k</span>
+        </div>
         <div className="mt-1.5 space-y-1.5">
-          {["Helvetia · R$ 420k", "Logística Alfa · R$ 240k", "Distrib. Sul · R$ 98k"].map((t) => (
-            <div key={t} className="rounded bg-background p-1.5 text-[10px] font-medium shadow-card">{t}</div>
+          {cards.map((c) => (
+            <div key={c.n} className="rounded-md bg-background p-1.5 shadow-card">
+              <div className="flex items-center gap-1.5">
+                <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full brand-gradient text-[6px] font-bold text-white">{c.ini}</span>
+                <span className="min-w-0 flex-1 truncate text-[9px] font-semibold">{c.n}</span>
+                <span className="shrink-0 text-[9px] font-bold">{c.v}</span>
+              </div>
+              <div className="mt-1 h-[3px] w-full overflow-hidden rounded-full bg-muted">
+                <div className="h-full rounded-full bg-primary" style={{ width: `${c.p}%` }} />
+              </div>
+              <div className="mt-1 flex items-center justify-between text-[7px] text-muted-foreground">
+                <span className="flex items-center gap-[3px]"><Clock className="h-2 w-2" /> {c.d}</span>
+                <span className="rounded-full bg-muted px-1 py-[1px] font-semibold">{c.tag}</span>
+              </div>
+            </div>
           ))}
         </div>
       </div>
       <div className="rounded-lg bg-muted p-2">
-        <div className="text-[10px] font-semibold uppercase text-muted-foreground">Fechamento · 3</div>
-        <div className="mt-1.5 space-y-1.5">
-          <div className="rounded bg-background p-1.5 text-[10px] font-medium shadow-card">Vega · R$ 84k</div>
+        <div className="flex items-center justify-between">
+          <span className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">Fechamento · 3</span>
+          <span className="text-[9px] font-bold text-success">R$ 184k</span>
+        </div>
+        <div className="mt-1.5 rounded-md bg-background p-1.5 shadow-card">
+          <div className="flex items-center gap-1.5">
+            <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-success/15 text-[6px] font-bold text-success">VG</span>
+            <span className="min-w-0 flex-1 truncate text-[9px] font-semibold">Vega Alimentos</span>
+            <span className="text-[9px] font-bold">R$ 84k</span>
+          </div>
         </div>
       </div>
     </div>
@@ -834,26 +879,46 @@ function MobilePipelinePreview() {
 }
 function MobileClientPreview() {
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <div className="grid h-9 w-9 place-items-center rounded-full brand-gradient text-xs font-bold text-white">GH</div>
-        <div>
-          <div className="text-xs font-bold">Grupo Helvetia</div>
-          <div className="text-[9px] text-muted-foreground">Cliente ativo</div>
+        <img src={industryLogo.url} alt="Cliente" loading="lazy" width={36} height={36} className="h-9 w-9 rounded-full border bg-card object-contain p-1" />
+        <div className="min-w-0">
+          <div className="truncate text-[11px] font-bold">Grupo Helvetia</div>
+          <div className="flex items-center gap-1 text-[8px] text-muted-foreground">
+            <span className="h-1 w-1 rounded-full bg-success" /> Cliente ativo · Indústria
+          </div>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-1.5">
-        {[["LTV", "R$ 420k"], ["NPS", "9.2"]].map(([l, v]) => (
-          <div key={l} className="rounded border bg-background p-1.5">
-            <div className="text-[8px] uppercase text-muted-foreground">{l}</div>
-            <div className="text-xs font-bold">{v}</div>
+      <div className="flex gap-1">
+        {[Phone, Mail, MessageCircle, Calendar].map((Icon, i) => (
+          <div key={i} className="grid flex-1 place-items-center rounded-md border bg-background py-1.5">
+            <Icon className="h-3 w-3 text-primary" />
           </div>
         ))}
       </div>
-      <div className="space-y-1.5">
-        {["Reunião há 2h", "Proposta enviada", "Contrato ativo"].map((t) => (
-          <div key={t} className="flex items-center gap-1.5 rounded border bg-background p-1.5 text-[10px]">
-            <CheckCircle2 className="h-3 w-3 text-success" /> {t}
+      <div className="grid grid-cols-3 gap-1.5">
+        {[["LTV", "R$ 420k"], ["NPS", "9.2"], ["Ciclo", "34d"]].map(([l, v]) => (
+          <div key={l} className="rounded-md border bg-background p-1.5">
+            <div className="text-[7px] uppercase tracking-wide text-muted-foreground">{l}</div>
+            <div className="text-[10px] font-bold">{v}</div>
+          </div>
+        ))}
+      </div>
+      <div className="rounded-md border bg-background p-2">
+        <div className="flex items-center justify-between text-[8px] text-muted-foreground">
+          <span className="font-semibold uppercase tracking-wide">Meta do trimestre</span>
+          <span className="font-bold text-foreground">78%</span>
+        </div>
+        <div className="mt-1 h-[4px] w-full overflow-hidden rounded-full bg-muted">
+          <div className="h-full w-[78%] rounded-full bg-success" />
+        </div>
+      </div>
+      <div className="space-y-1">
+        <div className="text-[8px] font-semibold uppercase tracking-wide text-muted-foreground">Linha do tempo</div>
+        {[["Reunião há 2h", "success"], ["Proposta enviada", "success"], ["Contrato ativo", "success"], ["Follow-up em 3d", "muted"]].map(([t, s]) => (
+          <div key={t} className="flex items-center gap-1.5 rounded-md border bg-background p-1.5 text-[9px]">
+            {s === "success" ? <CheckCircle2 className="h-2.5 w-2.5 shrink-0 text-success" /> : <Clock className="h-2.5 w-2.5 shrink-0 text-muted-foreground" />}
+            <span className="min-w-0 truncate">{t}</span>
           </div>
         ))}
       </div>
