@@ -48,7 +48,7 @@ import marianaPhoto from "@/assets/mariana-rocha.jpg.asset.json";
 import joaoPhoto from "@/assets/joao-silva.jpg.asset.json";
 import anaPhoto from "@/assets/ana-lima.jpg.asset.json";
 import pedroPhoto from "@/assets/pedro-tavares.jpg.asset.json";
-import pipelineMockup from "@/assets/pipeline-mockup-ai.png.asset.json";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -77,11 +77,9 @@ function LandingPage() {
       <Hero />
       <TrustBar />
       <PlatformOverview />
-      <PipelineSection />
       <ClientsSection />
       <TeamSection />
       <OmnichannelSection />
-      <AutomationSection />
       <DashboardSection />
       
       <ImplementationSection />
@@ -103,8 +101,6 @@ function Nav() {
         <FocusLogo />
         <nav className="hidden items-center gap-8 md:flex">
           <a href="#plataforma" className="text-sm text-muted-foreground hover:text-foreground">Plataforma</a>
-          <a href="#pipeline" className="text-sm text-muted-foreground hover:text-foreground">Pipeline</a>
-          
           <a href="#planos" className="text-sm text-muted-foreground hover:text-foreground">Planos</a>
         </nav>
         <div className="flex items-center gap-2">
@@ -293,53 +289,6 @@ function PlatformOverview() {
   );
 }
 
-/* ---------------- PIPELINE SECTION ---------------- */
-function PipelineSection() {
-  return (
-    <section id="pipeline" className="border-b bg-muted/30 py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-4">
-            <SectionHead
-              eyebrow="Pipeline"
-              title="Gestão visual de oportunidades"
-              desc="Acompanhe etapas, valores, responsáveis e probabilidade de conversão em tempo real. Padronize o processo comercial de toda a empresa."
-              align="left"
-            />
-            <ul className="mt-6 space-y-3 text-sm">
-              {[
-                "Valor consolidado por etapa",
-                "Previsão de fechamento ponderada",
-                "Distribuição automática de leads",
-                "Alertas de oportunidades paradas",
-                "Histórico completo de movimentações",
-              ].map((i) => (
-                <li key={i} className="flex items-start gap-2.5">
-                  <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-success" />
-                  <span className="text-muted-foreground">{i}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="lg:col-span-8">
-            <div className="overflow-hidden rounded-2xl border bg-card p-2 shadow-elevated sm:p-3">
-              <img
-                src={pipelineMockup.url}
-                alt="Pipeline comercial do Focus CRM mostrando etapas de Lead, Contato, Proposta, Negociação, Fechamento e Cliente Ativo com valores e oportunidades"
-                width={1584}
-                height={672}
-                className="h-auto w-full rounded-xl"
-                loading="lazy"
-
-              />
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* ---------------- CLIENTS SECTION ---------------- */
 function ClientsSection() {
@@ -586,46 +535,6 @@ function OmnichannelSection() {
   );
 }
 
-/* ---------------- AUTOMATION ---------------- */
-function AutomationSection() {
-  const steps = [
-    { i: Users, t: "Novo Lead" },
-    { i: Workflow, t: "Distribuição automática" },
-    { i: Calendar, t: "Follow-up agendado" },
-    { i: FileText, t: "Envio de proposta" },
-    { i: Target, t: "Fechamento" },
-
-  ];
-  return (
-    <section className="border-b bg-muted/30 py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        <SectionHead
-          eyebrow="Automações"
-          title="Padronize processos com fluxos visuais"
-          desc="Crie automações sem código que conectam pipeline, atendimento, equipe e dashboards."
-        />
-        <div className="mt-14">
-          <div className="mx-auto flex flex-wrap items-center justify-center gap-2 px-4 lg:px-0">
-
-            {steps.map((s, i) => (
-              <div key={s.t} className="flex items-center gap-2">
-                <div className="flex w-36 flex-col items-center rounded-xl border bg-card p-3 text-center shadow-card">
-                  <div className="mb-2 grid h-10 w-10 place-items-center rounded-lg bg-accent text-primary">
-                    <s.i className="h-5 w-5" />
-                  </div>
-                  <div className="text-xs font-semibold">{s.t}</div>
-                </div>
-                {i < steps.length - 1 && (
-                  <ArrowRight className="h-4 w-4 flex-shrink-0 text-primary" />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* ---------------- DASHBOARD ---------------- */
 function DashboardSection() {
