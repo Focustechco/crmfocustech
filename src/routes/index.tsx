@@ -124,39 +124,59 @@ function Hero() {
     <section className="relative overflow-hidden border-b">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_right,oklch(0.95_0.06_60),transparent_55%)] dark:bg-[radial-gradient(ellipse_at_top_right,oklch(0.3_0.1_40),transparent_55%)]"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,oklch(0.95_0.06_60),transparent_60%)] dark:bg-[radial-gradient(ellipse_at_top,oklch(0.28_0.08_40),transparent_60%)]"
       />
-      <div className="mx-auto grid max-w-7xl gap-12 px-6 py-20 lg:grid-cols-12 lg:gap-8 lg:py-28">
-        <div className="lg:col-span-5">
-          <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tight md:text-5xl lg:text-6xl">
-            Organize sua empresa. <span className="brand-text-gradient">Conecte sua equipe.</span> Cresça com eficiência.
+      <div className="mx-auto max-w-7xl px-6 pt-20 md:pt-28 lg:pt-32">
+        <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
+          <span className="hero-rise inline-flex items-center gap-2 rounded-full border bg-card/70 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground shadow-card backdrop-blur">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+            Focus CRM • Gestão comercial inteligente
+          </span>
+
+          <h1 className="hero-rise hero-d1 mt-8 font-display text-4xl font-extrabold leading-[1.03] tracking-tight sm:text-5xl lg:text-[4.25rem]">
+            Organize sua empresa.
+            <br />
+            <span className="brand-text-gradient">Conecte sua equipe.</span>
+            <br />
+            Venda mais.
           </h1>
-          <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-            Centralize clientes, negociações, atendimento e processos em uma única plataforma. O Focus CRM ajuda sua equipe a trabalhar de forma organizada, produtiva e escalável.
+
+          <p className="hero-rise hero-d2 mt-7 max-w-[700px] text-base text-muted-foreground sm:text-lg">
+            Centralize clientes, oportunidades, atendimento e processos em uma única plataforma. O Focus CRM dá à sua
+            equipe visão, organização e inteligência para vender melhor.
           </p>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Button asChild size="lg" className="brand-gradient text-white shadow-elevated hover:opacity-90">
-              <a href="#cta">Solicitar Demonstração <ArrowRight className="ml-2 h-4 w-4" /></a>
+
+          <div className="hero-rise hero-d3 mt-10 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
+            <Button
+              asChild
+              size="lg"
+              className="group w-full brand-gradient text-white shadow-elevated transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 sm:w-auto"
+            >
+              <a href="#cta">
+                Solicitar uma demonstração
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </a>
             </Button>
-            <Button asChild variant="outline" size="lg">
-              <a href="#plataforma">Conhecer Plataforma</a>
+            <Button asChild variant="outline" size="lg" className="w-full bg-transparent sm:w-auto">
+              <a href="#plataforma">Conhecer a plataforma</a>
             </Button>
           </div>
-          <dl className="mt-10 grid grid-cols-2 gap-x-6 gap-y-4 border-t pt-6 text-sm sm:grid-cols-4">
+
+          <ul className="hero-rise hero-d4 mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-muted-foreground sm:text-sm">
             {[
-              ["+10k", "oportunidades gerenciadas"],
-              ["+50k", "atendimentos registrados"],
-              ["99,9%", "disponibilidade"],
-              ["100%", "implantação assistida"],
-            ].map(([v, l]) => (
-              <div key={l}>
-                <dt className="font-display text-xl font-bold text-foreground">{v}</dt>
-                <dd className="text-xs text-muted-foreground">{l}</dd>
-              </div>
+              "Gestão comercial em um só lugar",
+              "Visão completa do seu negócio",
+              "Feito para equipes que querem crescer",
+            ].map((t) => (
+              <li key={t} className="flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5 text-primary" />
+                {t}
+              </li>
             ))}
-          </dl>
+          </ul>
         </div>
-        <div className="lg:col-span-7">
+
+        <div className="hero-rise hero-d5 mt-16 md:mt-20">
           <CRMMockup />
         </div>
       </div>
@@ -167,12 +187,12 @@ function Hero() {
 /* ---------------- MOCKUP CRM ---------------- */
 function CRMMockup() {
   return (
-    <figure className="relative mx-auto w-full max-w-[940px]">
+    <figure className="relative mx-auto w-[92%] max-w-[1180px]">
       <div
         aria-hidden
-        className="absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-tr from-primary/15 via-transparent to-primary/5 blur-2xl"
+        className="absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-tr from-primary/20 via-transparent to-primary/10 blur-3xl"
       />
-      <div className="overflow-hidden rounded-2xl border bg-card shadow-elevated">
+      <div className="hero-float overflow-hidden rounded-[20px] border bg-card shadow-elevated ring-1 ring-black/5">
         <img
           src={pipelineHero.url}
           alt="Interface do Focus CRM com indicadores comerciais e pipeline de vendas em Kanban"
@@ -183,9 +203,14 @@ function CRMMockup() {
           className="block h-auto w-full object-contain"
         />
       </div>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent"
+      />
     </figure>
   );
 }
+
 
 /* ---------------- CHANNEL INTEGRATIONS ---------------- */
 function TrustBar() {
