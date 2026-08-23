@@ -1,26 +1,31 @@
 import { cn } from "@/lib/utils";
-import foxLogo from "@/assets/focus-logo.png.asset.json";
+import logoDark from "@/assets/focus-crm-logo-dark.png.asset.json";
+import logoLight from "@/assets/focus-crm-logo-light.png.asset.json";
+import logoIcon from "@/assets/focus-crm-icon.png.asset.json";
 
 export function FocusLogo({ className, showText = true }: { className?: string; showText?: boolean }) {
-  return (
-    <div className={cn("flex items-center gap-2", className)}>
+  if (!showText) {
+    return (
       <img
-        src={foxLogo.url}
+        src={logoIcon.url}
         alt="Focus CRM"
-        width={42}
-        height={42}
-        className="h-[42px] w-[42px] object-contain"
+        className={cn("h-8 w-8 object-contain", className)}
       />
-      {showText && (
-        <div className="flex flex-col leading-none">
-          <span className="font-display text-base font-bold tracking-tight">
-            Focus<span className="text-primary"> CRM</span>
-          </span>
-          <span className="text-[10px] font-medium text-muted-foreground tracking-wider uppercase">
-            by Focus Tech
-          </span>
-        </div>
-      )}
-    </div>
+    );
+  }
+
+  return (
+    <>
+      <img
+        src={logoLight.url}
+        alt="Focus CRM — powered by Focus Tech"
+        className={cn("block h-auto w-[120px] object-contain md:w-[140px] dark:hidden", className)}
+      />
+      <img
+        src={logoDark.url}
+        alt="Focus CRM — powered by Focus Tech"
+        className={cn("hidden h-auto w-[120px] object-contain md:w-[140px] dark:block", className)}
+      />
+    </>
   );
 }

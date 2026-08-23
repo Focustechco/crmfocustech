@@ -50,7 +50,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b">
-        <div className="px-2 py-3">
+        <div className="flex h-16 items-center justify-center px-3">
           <FocusLogo showText={!collapsed} />
         </div>
       </SidebarHeader>
