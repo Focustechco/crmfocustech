@@ -124,10 +124,6 @@ function Hero() {
       />
       <div className="mx-auto max-w-7xl px-6 pt-20 md:pt-28 lg:pt-32">
         <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
-          <span className="hero-rise inline-flex items-center gap-2 rounded-full border bg-card/70 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground shadow-card backdrop-blur">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            Focus CRM • Gestão comercial inteligente
-          </span>
 
           <h1 className="hero-rise hero-d1 mt-8 font-display text-4xl font-extrabold leading-[1.03] tracking-tight sm:text-5xl lg:text-[4.25rem]">
             Organize sua empresa.
