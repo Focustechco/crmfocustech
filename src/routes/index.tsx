@@ -179,12 +179,49 @@ function Hero() {
 /* ---------------- MOCKUP CRM ---------------- */
 function CRMMockup() {
   return (
-    <figure className="relative mx-auto w-[92%] max-w-[1180px]">
+    <figure className="relative mx-auto w-full max-w-[1240px]">
+      {/* halo suave laranja atrás do produto */}
       <div
         aria-hidden
-        className="absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-tr from-primary/20 via-transparent to-primary/10 blur-3xl"
+        className="pointer-events-none absolute -inset-x-16 -top-24 bottom-0 -z-20 bg-[radial-gradient(60%_55%_at_50%_35%,oklch(0.75_0.18_50_/_0.18),transparent_70%)] blur-2xl"
       />
-      <div className="hero-float overflow-hidden rounded-[20px] border bg-card shadow-elevated ring-1 ring-black/5">
+      {/* blobs orgânicos */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-24 top-8 -z-20 hidden h-72 w-72 rounded-full bg-primary/10 blur-3xl md:block"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-28 top-24 -z-20 hidden h-80 w-80 rounded-full bg-primary/[0.07] blur-3xl md:block"
+      />
+
+      {/* malha de pontos + linhas curvas nascendo da interface */}
+      <svg
+        aria-hidden
+        viewBox="0 0 1200 640"
+        preserveAspectRatio="none"
+        className="pointer-events-none absolute -inset-x-10 -top-16 bottom-[-4rem] -z-10 hidden h-[calc(100%+9rem)] w-[calc(100%+5rem)] md:block"
+      >
+        <defs>
+          <pattern id="hero-dots" width="26" height="26" patternUnits="userSpaceOnUse">
+            <circle cx="1.5" cy="1.5" r="1.5" fill="currentColor" className="text-primary/25" />
+          </pattern>
+          <linearGradient id="hero-line" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="currentColor" stopOpacity="0" />
+            <stop offset="50%" stopColor="currentColor" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <rect x="0" y="380" width="240" height="200" fill="url(#hero-dots)" opacity="0.7" />
+        <rect x="960" y="60" width="240" height="180" fill="url(#hero-dots)" opacity="0.55" />
+        <g className="text-primary" fill="none" stroke="url(#hero-line)" strokeWidth="1.2">
+          <path d="M-40 470 C 220 400, 380 560, 700 470 S 1120 300, 1260 360" />
+          <path d="M-40 540 C 260 500, 420 620, 780 520 S 1140 420, 1260 450" opacity="0.6" />
+        </g>
+      </svg>
+
+      {/* dashboard solto, sem moldura */}
+      <div className="hero-float relative">
         <img
           src={pipelineHero.url}
           alt="Interface do Focus CRM com indicadores comerciais e pipeline de vendas em Kanban"
@@ -192,16 +229,43 @@ function CRMMockup() {
           height={1024}
           fetchPriority="high"
           decoding="async"
-          className="block h-auto w-full object-contain"
+          className="relative block h-auto w-full select-none object-contain drop-shadow-[0_30px_60px_oklch(0.55_0.12_45_/_0.12)]"
+          style={{
+            maskImage:
+              "radial-gradient(120% 110% at 50% 40%, #000 62%, transparent 97%), linear-gradient(to bottom, #000 78%, transparent 100%)",
+            WebkitMaskImage:
+              "radial-gradient(120% 110% at 50% 40%, #000 62%, transparent 97%), linear-gradient(to bottom, #000 78%, transparent 100%)",
+            maskComposite: "intersect",
+            WebkitMaskComposite: "source-in",
+          }}
         />
+
+        {/* indicadores flutuantes discretos, parcialmente à frente */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-6 top-[28%] hidden items-end gap-1 rounded-xl bg-background/60 px-3 py-2 shadow-sm backdrop-blur-sm lg:flex"
+        >
+          {[10, 18, 14, 24, 30].map((h, i) => (
+            <span key={i} className="w-1.5 rounded-full bg-primary/60" style={{ height: h }} />
+          ))}
+        </div>
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-4 top-[16%] hidden rounded-full bg-background/60 px-3 py-1 text-[11px] font-medium text-primary shadow-sm backdrop-blur-sm lg:block"
+        >
+          +32% conversão
+        </div>
       </div>
+
+      {/* fusão inferior com o background */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent"
+        className="pointer-events-none absolute inset-x-0 -bottom-2 h-40 bg-gradient-to-t from-background via-background/70 to-transparent"
       />
     </figure>
   );
 }
+
 
 
 /* ---------------- CHANNEL INTEGRATIONS ---------------- */
