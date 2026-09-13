@@ -497,42 +497,47 @@ function ComercialOSPage() {
     }));
   }, [teamPerformance]);
 
-  // Handler para Registrar Atividade
+  // Handler para Registrar Ação Resumida
   const handleCreateActivity = () => {
-    if (!formTitle.trim() || !formLeadName.trim()) {
-      return toast.error("Preencha o título e o nome do lead.");
+    if (!formLeadName.trim()) {
+      return toast.error("Informe o nome do lead ou cliente.");
     }
+
+    const defaultTitle =
+      formType === "call"
+        ? "Ligação Comercial"
+        : formType === "meeting"
+        ? "Reunião de Alinhamento"
+        : formType === "followup"
+        ? "Follow-up Comercial"
+        : "Contrato Fechado";
+
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 
     const newAct: CommercialActivity = {
       id: `act-${Date.now()}`,
       type: formType,
-      title: formTitle.trim(),
+      title: defaultTitle,
       leadName: formLeadName.trim(),
-      company: formCompany.trim() || undefined,
-      phone: formPhone.trim() || undefined,
       responsibleId: formResponsibleId,
       date: formDate,
-      time: formTime,
-      duration: formType === "call" || formType === "meeting" ? formDuration : undefined,
+      time: timeStr,
       value: formType === "deal_won" ? Number(formValue.replace(/\D/g, "")) || 0 : undefined,
       status: formStatus,
-      notes: formNotes.trim(),
-      createdAt: new Date().toISOString(),
+      notes: "",
+      createdAt: now.toISOString(),
     };
 
     setActivities((prev) => [newAct, ...prev]);
     toast.success(
       formType === "deal_won"
-        ? "🏆 Contrato fechado registrado com sucesso!"
-        : "Atividade comercial registrada com sucesso!",
+        ? "🏆 Contrato registrado com sucesso!"
+        : "Ação registrada com sucesso!",
     );
 
-    // Reset form
-    setFormTitle("");
+    // Reset form resumido
     setFormLeadName("");
-    setFormCompany("");
-    setFormPhone("");
-    setFormNotes("");
     setFormValue("");
     setIsActivityModalOpen(false);
   };
@@ -1507,26 +1512,26 @@ function ComercialOSPage() {
       {/* ========================================================================= */}
       {/* MODAL 1: REGISTRAR ATIVIDADE COMERCIAL */}
       {/* ========================================================================= */}
+      {/* ========================================================================= */}
+      {/* MODAL 1: REGISTRAR AÇÃO RESUMIDA (SEM TEXTO/DESCRIÇÃO LONGA) */}
+      {/* ========================================================================= */}
       <Dialog open={isActivityModalOpen} onOpenChange={setIsActivityModalOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5 text-primary" />
-              Registrar Atividade Comercial
+        <DialogContent className="max-w-md p-5">
+          <DialogHeader className="pb-2 border-b">
+            <DialogTitle className="flex items-center gap-2 text-base font-bold">
+              <Target className="h-4 w-4 text-primary" />
+              Registrar Ação
             </DialogTitle>
-            <DialogDescription>
-              Contabilize ações da equipe como ligações, reuniões agendadas, follow-ups ou contratos fechados.
-            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
-            {/* Seletor de Tipo de Ação */}
+            {/* Seletor Rápido de Tipo de Ação */}
             <div className="grid grid-cols-4 gap-2">
               {[
-                { id: "call", label: "Ligação", icon: Phone, color: "text-blue-500" },
-                { id: "meeting", label: "Reunião", icon: Calendar, color: "text-amber-500" },
-                { id: "followup", label: "Follow-up", icon: RotateCcw, color: "text-purple-500" },
-                { id: "deal_won", label: "Fechamento", icon: Trophy, color: "text-emerald-500" },
+                { id: "call", label: "Ligação", icon: Phone, color: "text-blue-500", bg: "hover:bg-blue-500/10" },
+                { id: "meeting", label: "Reunião", icon: Calendar, color: "text-amber-500", bg: "hover:bg-amber-500/10" },
+                { id: "followup", label: "Follow-up", icon: RotateCcw, color: "text-purple-500", bg: "hover:bg-purple-500/10" },
+                { id: "deal_won", label: "Fechamento", icon: Trophy, color: "text-emerald-500", bg: "hover:bg-emerald-500/10" },
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isSelected = formType === tab.id;
@@ -1534,178 +1539,104 @@ function ComercialOSPage() {
                   <button
                     key={tab.id}
                     type="button"
-                    onClick={() => {
-                      setFormType(tab.id as ActivityType);
-                      if (tab.id === "call") setFormTitle("Ligação de Prospecção / Follow-up");
-                      if (tab.id === "meeting") setFormTitle("Reunião de Demonstração / Proposta");
-                      if (tab.id === "followup") setFormTitle("Follow-up de Negociação");
-                      if (tab.id === "deal_won") setFormTitle("Contrato Assinado / Fechamento");
-                    }}
+                    onClick={() => setFormType(tab.id as ActivityType)}
                     className={`flex flex-col items-center justify-center p-2.5 rounded-xl border transition-all cursor-pointer ${
                       isSelected
-                        ? "border-primary bg-primary/10 font-bold shadow-xs"
-                        : "border-border/60 hover:bg-muted/40"
+                        ? "border-primary bg-primary/10 font-bold shadow-xs scale-102"
+                        : `border-border/60 ${tab.bg}`
                     }`}
                   >
                     <Icon className={`h-4 w-4 mb-1 ${tab.color}`} />
-                    <span className="text-xs">{tab.label}</span>
+                    <span className="text-[11px]">{tab.label}</span>
                   </button>
                 );
               })}
             </div>
 
-            {/* Título da Atividade */}
+            {/* Lead / Cliente */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">Título do Registro</label>
+              <label className="text-xs font-semibold text-foreground">Lead / Cliente *</label>
               <Input
-                value={formTitle}
-                onChange={(e) => setFormTitle(e.target.value)}
-                placeholder="Ex: Demonstração do CRM, Ligação de Qualificação..."
+                value={formLeadName}
+                onChange={(e) => setFormLeadName(e.target.value)}
+                placeholder="Nome do lead ou empresa"
                 className="h-9 text-xs"
+                autoFocus
               />
             </div>
 
-            {/* Dados do Lead / Empresa */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">Nome do Lead / Cliente *</label>
-                <Input
-                  value={formLeadName}
-                  onChange={(e) => setFormLeadName(e.target.value)}
-                  placeholder="Ex: Roberto Carlos"
-                  className="h-9 text-xs"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">Empresa</label>
-                <Input
-                  value={formCompany}
-                  onChange={(e) => setFormCompany(e.target.value)}
-                  placeholder="Ex: Alpha Logística"
-                  className="h-9 text-xs"
-                />
-              </div>
-            </div>
-
-            {/* Telefone / WhatsApp */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">WhatsApp / Telefone</label>
-                <Input
-                  value={formPhone}
-                  onChange={(e) => setFormPhone(e.target.value)}
-                  placeholder="Ex: 11999998888"
-                  className="h-9 text-xs"
-                />
-              </div>
-
-              {/* Consultor Responsável */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">Consultor Responsável</label>
-                <Select value={formResponsibleId} onValueChange={setFormResponsibleId}>
-                  <SelectTrigger className="h-9 text-xs">
-                    <SelectValue placeholder="Selecione o vendedor" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TEAM_MEMBERS.map((m) => (
-                      <SelectItem key={m.id} value={m.id}>
-                        {m.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Data, Horário e Duração ou Valor */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">Data</label>
-                <Input
-                  type="date"
-                  value={formDate}
-                  onChange={(e) => setFormDate(e.target.value)}
-                  className="h-9 text-xs"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground">Horário</label>
-                <Input
-                  type="time"
-                  value={formTime}
-                  onChange={(e) => setFormTime(e.target.value)}
-                  className="h-9 text-xs"
-                />
-              </div>
-
-              {formType === "deal_won" ? (
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Valor do Contrato (R$)</label>
-                  <Input
-                    value={formValue}
-                    onChange={(e) => setFormValue(e.target.value)}
-                    placeholder="Ex: 25000"
-                    className="h-9 text-xs font-bold text-emerald-600"
-                  />
-                </div>
-              ) : (
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-foreground">Duração estimada</label>
-                  <Input
-                    value={formDuration}
-                    onChange={(e) => setFormDuration(e.target.value)}
-                    placeholder="Ex: 20 min"
-                    className="h-9 text-xs"
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* Status */}
+            {/* Consultor Responsável */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">Status da Atividade</label>
-              <Select value={formStatus} onValueChange={(v) => setFormStatus(v as ActivityStatus)}>
+              <label className="text-xs font-semibold text-foreground">Consultor</label>
+              <Select value={formResponsibleId} onValueChange={setFormResponsibleId}>
                 <SelectTrigger className="h-9 text-xs">
-                  <SelectValue placeholder="Status" />
+                  <SelectValue placeholder="Selecione o vendedor" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="completed">Concluída (Realizada agora)</SelectItem>
-                  <SelectItem value="scheduled">Agendada (Futura)</SelectItem>
-                  <SelectItem value="pending">Pendente (Aguardando retorno)</SelectItem>
+                  {TEAM_MEMBERS.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>
+                      {m.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Notas / Resumo */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">Resumo / Anotações da Conversa</label>
-              <Textarea
-                value={formNotes}
-                onChange={(e) => setFormNotes(e.target.value)}
-                placeholder="Principais dores do cliente, próximos passos, objeções discutidas..."
-                rows={3}
-                className="text-xs"
-              />
-            </div>
+            {/* Se Fechamento: Valor / Caso contrário: Status + Data */}
+            {formType === "deal_won" ? (
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-foreground">Valor do Contrato (R$)</label>
+                <Input
+                  value={formValue}
+                  onChange={(e) => setFormValue(e.target.value)}
+                  placeholder="Ex: 15.000"
+                  className="h-9 text-xs font-bold text-emerald-600"
+                />
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2.5">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Status</label>
+                  <Select value={formStatus} onValueChange={(v) => setFormStatus(v as ActivityStatus)}>
+                    <SelectTrigger className="h-9 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="completed">Concluída</SelectItem>
+                      <SelectItem value="scheduled">Agendada</SelectItem>
+                      <SelectItem value="pending">Pendente</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-foreground">Data</label>
+                  <Input
+                    type="date"
+                    value={formDate}
+                    onChange={(e) => setFormDate(e.target.value)}
+                    className="h-9 text-xs"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
-          <DialogFooter className="gap-2">
+          <DialogFooter className="pt-2 border-t flex items-center justify-end gap-2">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setIsActivityModalOpen(false)}
-              className="cursor-pointer"
+              className="cursor-pointer text-xs h-8"
             >
               Cancelar
             </Button>
             <Button
               size="sm"
               onClick={handleCreateActivity}
-              className="brand-gradient text-white font-medium cursor-pointer"
+              className="brand-gradient text-white font-medium cursor-pointer text-xs h-8"
             >
-              Salvar Atividade
+              + Salvar Ação
             </Button>
           </DialogFooter>
         </DialogContent>
