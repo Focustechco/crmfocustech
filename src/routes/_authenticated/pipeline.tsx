@@ -45,6 +45,8 @@ import {
   Rows3,
   Tag,
   Check,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -510,6 +512,24 @@ export function PipelinePage() {
   const [selectedTagFilter, setSelectedTagFilter] = useState<string>("all");
   const [selectedPeriod, setSelectedPeriod] = useState<string>("30");
 
+  // Ocultar / Mostrar Valores Financeiros
+  const [hideFinancialValues, setHideFinancialValues] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("focus_crm_pipeline_hide_values") === "true";
+    }
+    return false;
+  });
+
+  const toggleHideFinancialValues = () => {
+    setHideFinancialValues((prev) => {
+      const next = !prev;
+      if (typeof window !== "undefined") {
+        localStorage.setItem("focus_crm_pipeline_hide_values", String(next));
+      }
+      return next;
+    });
+  };
+
   // Drag & Drop
   const [draggingDealId, setDraggingDealId] = useState<string | null>(null);
   const [dragOverStageId, setDragOverStageId] = useState<string | null>(null);
@@ -956,6 +976,27 @@ export function PipelinePage() {
             </Select>
           </div>
 
+          {/* Botão Ocultar / Mostrar Valores Financeiros: Minimalista apenas Ícone */}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={toggleHideFinancialValues}
+            className={cn(
+              "h-9 w-9 bg-card border-border/80 shrink-0 transition-colors cursor-pointer",
+              hideFinancialValues
+                ? "text-muted-foreground border-border hover:text-foreground"
+                : "text-foreground hover:text-[#FF6B00]"
+            )}
+            title={hideFinancialValues ? "Mostrar valores financeiros" : "Ocultar valores financeiros"}
+            aria-label={hideFinancialValues ? "Mostrar valores financeiros" : "Ocultar valores financeiros"}
+          >
+            {hideFinancialValues ? (
+              <EyeOff className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <Eye className="h-4 w-4 text-muted-foreground hover:text-[#FF6B00]" />
+            )}
+          </Button>
+
           {/* Botão Gerenciar Etiquetas: Apenas Ícone */}
           <Button
             variant="outline"
@@ -1014,7 +1055,7 @@ export function PipelinePage() {
                       </span>
                     </h3>
                     <p className="text-xs font-bold text-[#FF6B00]">
-                      {BRL(stat.totalValue)}
+                      {hideFinancialValues ? "••••••" : BRL(stat.totalValue)}
                     </p>
                   </div>
                 </div>
@@ -1136,7 +1177,7 @@ export function PipelinePage() {
                           {deal.title}
                         </h4>
                         <span className="font-bold text-foreground text-xs shrink-0">
-                          {BRL(deal.value)}
+                          {hideFinancialValues ? "••••••" : BRL(deal.value)}
                         </span>
                       </div>
 
@@ -1238,7 +1279,7 @@ export function PipelinePage() {
                         {deal.title}
                       </h4>
                       <p className="text-sm font-extrabold text-foreground mt-1">
-                        {BRL(deal.value)}
+                        {hideFinancialValues ? "••••••" : BRL(deal.value)}
                       </p>
 
                       {/* Contato e Empresa */}
