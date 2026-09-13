@@ -740,63 +740,63 @@ function ComercialOSPage() {
       </div>
 
       {/* Barra de Filtros e Controles Rápidos */}
-      <Card className="p-3.5 bg-card border-border/80 shadow-xs">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Abas de visualização */}
-          <div className="flex items-center gap-1.5 bg-muted/60 p-1 rounded-lg self-start flex-wrap">
+      <Card className="p-2 sm:p-2.5 bg-card border-border/80 shadow-xs">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
+          {/* Abas de visualização na mesma linha */}
+          <div className="flex items-center gap-1 bg-muted/60 p-0.5 rounded-lg overflow-x-auto no-scrollbar shrink-0">
             <Button
               variant={activeTab === "ranking" ? "default" : "ghost"}
               size="sm"
               onClick={() => setActiveTab("ranking")}
-              className={`text-xs h-8 cursor-pointer ${
+              className={`text-xs h-7.5 px-2.5 cursor-pointer font-medium ${
                 activeTab === "ranking" ? "bg-primary text-white shadow-xs font-semibold" : ""
               }`}
             >
-              <Award className="h-3.5 w-3.5 mr-1.5" />
-              Ranking da Equipe
+              <Award className="h-3.5 w-3.5 mr-1" />
+              Ranking
             </Button>
             <Button
               variant={activeTab === "activities" ? "default" : "ghost"}
               size="sm"
               onClick={() => setActiveTab("activities")}
-              className={`text-xs h-8 cursor-pointer ${
+              className={`text-xs h-7.5 px-2.5 cursor-pointer font-medium ${
                 activeTab === "activities" ? "bg-primary text-white shadow-xs font-semibold" : ""
               }`}
             >
-              <Activity className="h-3.5 w-3.5 mr-1.5" />
-              Feed de Atividades ({filteredActivities.length})
+              <Activity className="h-3.5 w-3.5 mr-1" />
+              Atividades
             </Button>
             <Button
               variant={activeTab === "charts" ? "default" : "ghost"}
               size="sm"
               onClick={() => setActiveTab("charts")}
-              className={`text-xs h-8 cursor-pointer ${
+              className={`text-xs h-7.5 px-2.5 cursor-pointer font-medium ${
                 activeTab === "charts" ? "bg-primary text-white shadow-xs font-semibold" : ""
               }`}
             >
-              <Target className="h-3.5 w-3.5 mr-1.5" />
-              Produtividade & Gráficos
+              <Target className="h-3.5 w-3.5 mr-1" />
+              Produtividade
             </Button>
             <Button
               variant={activeTab === "deals" ? "default" : "ghost"}
               size="sm"
               onClick={() => setActiveTab("deals")}
-              className={`text-xs h-8 cursor-pointer ${
+              className={`text-xs h-7.5 px-2.5 cursor-pointer font-medium ${
                 activeTab === "deals" ? "bg-primary text-white shadow-xs font-semibold" : ""
               }`}
             >
-              <FileCheck className="h-3.5 w-3.5 mr-1.5" />
-              Contratos Fechados
+              <FileCheck className="h-3.5 w-3.5 mr-1" />
+              Contratos
             </Button>
           </div>
 
-          {/* Filtros de Vendedor e Período */}
-          <div className="flex items-center gap-2 flex-wrap">
+          {/* Filtros de Vendedor e Período na mesma linha */}
+          <div className="flex items-center gap-1.5 shrink-0 justify-between sm:justify-end w-full lg:w-auto">
             {/* Filtro de Consultor */}
             <Select value={selectedConsultant} onValueChange={setSelectedConsultant}>
-              <SelectTrigger className="h-8 text-xs w-[180px] bg-background">
-                <Users className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
-                <SelectValue placeholder="Todos os Consultores" />
+              <SelectTrigger className="h-7.5 text-xs w-[140px] sm:w-[160px] bg-background px-2">
+                <Users className="h-3.5 w-3.5 mr-1 text-muted-foreground shrink-0" />
+                <SelectValue placeholder="Toda a Equipe" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Toda a Equipe</SelectItem>
@@ -813,15 +813,15 @@ function ComercialOSPage() {
               value={selectedPeriod}
               onValueChange={(v) => setSelectedPeriod(v as any)}
             >
-              <SelectTrigger className="h-8 text-xs w-[140px] bg-background">
-                <CalendarDays className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
+              <SelectTrigger className="h-7.5 text-xs w-[115px] sm:w-[130px] bg-background px-2">
+                <CalendarDays className="h-3.5 w-3.5 mr-1 text-muted-foreground shrink-0" />
                 <SelectValue placeholder="Período" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="today">Hoje</SelectItem>
                 <SelectItem value="week">Esta Semana</SelectItem>
                 <SelectItem value="month">Este Mês</SelectItem>
-                <SelectItem value="all">Todo o Histórico</SelectItem>
+                <SelectItem value="all">Histórico</SelectItem>
               </SelectContent>
             </Select>
 
@@ -833,7 +833,7 @@ function ComercialOSPage() {
                 setIsActivityModalOpen(true);
               }}
               size="sm"
-              className="md:hidden brand-gradient text-white h-8 text-xs font-semibold cursor-pointer"
+              className="lg:hidden brand-gradient text-white h-7.5 text-xs px-2.5 font-semibold cursor-pointer shrink-0"
             >
               <Plus className="h-3.5 w-3.5 mr-1" />
               + Ação
