@@ -266,13 +266,12 @@ export function SettingsPage() {
   };
 
   return (
-    <div className="flex-1 space-y-6 p-4 md:p-8 bg-background min-h-screen">
-      {/* Top Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b pb-5">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-            <Building2 className="h-7 w-7 text-[#FF6B00]" />
-            Configurações do Sistema
+    <div className="space-y-6 pb-12">
+      {/* 1. Header com Título */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="hidden md:block">
+          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+            Configurações
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             Gerencie perfil, preferências de notificação, equipe comercial, integrações e dados da empresa.

@@ -485,30 +485,23 @@ function ProspeccaoPage() {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Header Desktop */}
-      <div className="hidden md:flex md:items-center md:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-primary/10 text-primary">
-              <Compass className="h-6 w-6" />
-            </div>
-            <div>
-              <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
-                Prospecção
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Hub de Sales Enablement, Scripts, Apresentação e Central do SDR.
-              </p>
-            </div>
-          </div>
+      {/* 1. Header com Título e Ações */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="hidden md:block">
+          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+            Prospecção
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Hub de Sales Enablement, scripts de abordagem, apresentação e central do SDR.
+          </p>
         </div>
 
-        <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap ml-auto md:ml-0">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setIsNewResourceModalOpen(true)}
-            className="gap-2 border-border/80 hover:bg-accent cursor-pointer text-xs h-9"
+            className="gap-1.5 border-border hover:bg-muted text-xs h-9"
           >
             <Plus className="h-4 w-4 text-muted-foreground" />
             + Adicionar Documento/Link
@@ -516,9 +509,9 @@ function ProspeccaoPage() {
 
           <Button
             onClick={() => setIsNewScriptModalOpen(true)}
-            className="brand-gradient text-white gap-2 font-medium shadow-sm hover:opacity-95 cursor-pointer text-xs h-9"
+            className="bg-[#FF6B00] hover:bg-[#E65C00] text-white gap-1.5 font-medium shadow-xs text-xs h-9"
           >
-            <Plus className="h-4 w-4 stroke-[3]" />
+            <Plus className="h-4 w-4" />
             + Novo Script
           </Button>
         </div>

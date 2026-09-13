@@ -913,12 +913,11 @@ export function TasksAndAgendaPage() {
   };
 
   return (
-    <div className="flex-1 space-y-6 p-4 md:p-8 bg-background min-h-screen">
-      {/* Top Header & Ações */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b pb-5">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground flex items-center gap-2">
-            <CalendarCheck className="h-7 w-7 text-[#FF6B00]" />
+    <div className="space-y-6 pb-12">
+      {/* 1. Header com Título e Ações */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="hidden md:block">
+          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground">
             Tarefas e Agenda
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
@@ -926,7 +925,7 @@ export function TasksAndAgendaPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap ml-auto md:ml-0">
           <Button
             onClick={() => setOpenMeetingModal(true)}
             className="bg-[#FF6B00] hover:bg-[#E65C00] text-white shadow-xs"
