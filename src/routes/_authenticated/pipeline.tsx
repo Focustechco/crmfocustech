@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { GripVertical, Plus } from "lucide-react";
+import { Building2, Plus, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/pipeline")({
   head: () => ({ meta: [{ title: "Pipeline · Focus CRM" }] }),
@@ -22,8 +22,25 @@ const DEFAULT_STAGES = [
   { name: "Fechamento", color: "#10B981" },
 ];
 
+const BRL = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL",
+  maximumFractionDigits: 0,
+});
+
+function initials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]!.toUpperCase())
+    .join("");
+}
+
 function PipelinePage() {
   const qc = useQueryClient();
+  const [dragOverStage, setDragOverStage] = useState<string | null>(null);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
 
   const { data: stages = [] } = useQuery({
     queryKey: ["stages"],
@@ -75,13 +92,68 @@ function PipelinePage() {
 
   const onDragStart = (e: React.DragEvent, leadId: string) => {
     e.dataTransfer.setData("text/plain", leadId);
+    e.dataTransfer.effectAllowed = "move";
+    setDraggingId(leadId);
   };
 
-  const onDrop = (e: React.DragEvent, stageId: string) => {
+  const onDragEnd = () => {
+    setDraggingId(null);
+    setDragOverStage(null);
+  };
+
+  const onDrop = (e: React.DragEvent, stageId: string | null) => {
     e.preventDefault();
     const leadId = e.dataTransfer.getData("text/plain");
     if (leadId) moveLead(leadId, stageId);
+    setDragOverStage(null);
+    setDraggingId(null);
   };
+
+  const renderCard = (l: (typeof leads)[number], color?: string) => (
+    <div
+      key={l.id}
+      draggable
+      onDragStart={(e) => onDragStart(e, l.id)}
+      onDragEnd={onDragEnd}
+      className={cn(
+        "group cursor-grab rounded-xl border border-border/70 bg-card p-3.5 shadow-card transition-all duration-200",
+        "hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-elevated active:cursor-grabbing",
+        draggingId === l.id && "opacity-40 scale-[0.97]"
+      )}
+    >
+      <div className="flex items-start gap-2.5">
+        <div
+          className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-[11px] font-bold text-white"
+          style={{ backgroundColor: color ?? "var(--primary)" }}
+        >
+          {initials(l.name)}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold leading-tight">{l.name}</p>
+          {l.company && (
+            <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-muted-foreground">
+              <Building2 className="h-3 w-3 shrink-0" />
+              {l.company}
+            </p>
+          )}
+        </div>
+      </div>
+      <div className="mt-3 flex items-center justify-between border-t border-border/60 pt-2.5 text-xs">
+        <span className="flex items-center gap-1 font-semibold text-primary">
+          <TrendingUp className="h-3 w-3" />
+          {BRL.format(Number(l.potential_value ?? 0))}
+        </span>
+        {l.score ? (
+          <Badge
+            variant="secondary"
+            className="h-5 rounded-md px-1.5 text-[10px] font-semibold"
+          >
+            Score {l.score}
+          </Badge>
+        ) : null}
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -92,69 +164,71 @@ function PipelinePage() {
         </p>
       </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-4">
+      <div className="flex items-stretch gap-4 overflow-x-auto pb-4">
         {stages.map((stage) => {
           const stageLeads = leads.filter((l) => l.stage_id === stage.id);
           const total = stageLeads.reduce((s, l) => s + Number(l.potential_value ?? 0), 0);
+          const isOver = dragOverStage === stage.id;
           return (
             <div
               key={stage.id}
-              className="w-72 shrink-0"
-              onDragOver={(e) => e.preventDefault()}
+              className={cn(
+                "flex w-72 shrink-0 flex-col rounded-2xl border bg-secondary/40 p-3 transition-colors duration-200",
+                isOver ? "border-primary/60 bg-accent/60" : "border-border/60"
+              )}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOverStage(stage.id);
+              }}
+              onDragLeave={() => setDragOverStage((s) => (s === stage.id ? null : s))}
               onDrop={(e) => onDrop(e, stage.id)}
             >
-              <div className="mb-3 flex items-center justify-between rounded-lg bg-card border p-3 shadow-card">
-                <div className="flex items-center gap-2">
+              {/* Colored accent bar */}
+              <div
+                className="h-1 w-10 rounded-full"
+                style={{ backgroundColor: stage.color }}
+              />
+
+              {/* Column header */}
+              <div className="mb-1 mt-2.5 flex items-center justify-between gap-2">
+                <div className="flex min-w-0 items-center gap-2">
                   <span
-                    className="h-2.5 w-2.5 rounded-full"
-                    style={{ backgroundColor: stage.color }}
+                    className="h-2 w-2 shrink-0 rounded-full ring-4"
+                    style={{
+                      backgroundColor: stage.color,
+                      ["--tw-ring-color" as string]: `${stage.color}26`,
+                    }}
                   />
-                  <span className="font-medium text-sm">{stage.name}</span>
-                  <Badge variant="secondary" className="ml-1 text-[10px]">
+                  <span className="truncate text-sm font-semibold">{stage.name}</span>
+                  <span
+                    className="grid h-5 min-w-5 shrink-0 place-items-center rounded-full px-1.5 text-[10px] font-bold text-white"
+                    style={{ backgroundColor: stage.color }}
+                  >
                     {stageLeads.length}
-                  </Badge>
+                  </span>
                 </div>
-                <Button size="icon" variant="ghost" className="h-6 w-6">
+                <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0">
                   <Plus className="h-3.5 w-3.5" />
                 </Button>
               </div>
-              <div className="space-y-2 min-h-[100px]">
-                {stageLeads.map((l) => (
-                  <Card
-                    key={l.id}
-                    draggable
-                    onDragStart={(e) => onDragStart(e, l.id)}
-                    className="cursor-grab p-3 shadow-card transition-all hover:shadow-elevated hover:-translate-y-0.5 active:cursor-grabbing"
+
+              <p className="mb-3 text-[11px] font-medium text-muted-foreground">
+                {BRL.format(total)} em oportunidades
+              </p>
+
+              {/* Cards */}
+              <div className="flex-1 space-y-2.5">
+                {stageLeads.map((l) => renderCard(l, stage.color))}
+                {stageLeads.length === 0 && (
+                  <div
+                    className={cn(
+                      "grid min-h-[90px] place-items-center rounded-xl border border-dashed text-xs text-muted-foreground transition-colors",
+                      isOver ? "border-primary/60 bg-accent" : "border-border"
+                    )}
                   >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className="font-medium text-sm truncate">{l.name}</p>
-                        {l.company && (
-                          <p className="text-xs text-muted-foreground truncate">{l.company}</p>
-                        )}
-                      </div>
-                      <GripVertical className="h-3.5 w-3.5 text-muted-foreground/50" />
-                    </div>
-                    <div className="mt-3 flex items-center justify-between text-xs">
-                      <span className="font-semibold text-primary">
-                        {new Intl.NumberFormat("pt-BR", {
-                          style: "currency",
-                          currency: "BRL",
-                          maximumFractionDigits: 0,
-                        }).format(Number(l.potential_value ?? 0))}
-                      </span>
-                      {l.score ? (
-                        <Badge variant="secondary" className="text-[10px]">
-                          Score {l.score}
-                        </Badge>
-                      ) : null}
-                    </div>
-                  </Card>
-                ))}
-              </div>
-              <div className="mt-2 text-xs text-muted-foreground text-right">
-                Total:{" "}
-                {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(total)}
+                    Solte o lead aqui
+                  </div>
+                )}
               </div>
             </div>
           );
@@ -162,27 +236,27 @@ function PipelinePage() {
 
         {/* Unassigned column */}
         <div
-          className="w-72 shrink-0"
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => onDrop(e, "")}
+          className={cn(
+            "flex w-72 shrink-0 flex-col rounded-2xl border border-dashed p-3 transition-colors duration-200",
+            dragOverStage === "none" ? "border-primary/60 bg-accent/60" : "border-border"
+          )}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOverStage("none");
+          }}
+          onDragLeave={() => setDragOverStage((s) => (s === "none" ? null : s))}
+          onDrop={(e) => onDrop(e, null)}
         >
-          <div className="mb-3 rounded-lg border border-dashed p-3 text-sm text-muted-foreground">
+          <div className="mb-3 mt-1 text-sm font-semibold text-muted-foreground">
             Sem etapa
           </div>
-          <div className="space-y-2">
-            {leads
-              .filter((l) => !l.stage_id)
-              .map((l) => (
-                <Card
-                  key={l.id}
-                  draggable
-                  onDragStart={(e) => onDragStart(e, l.id)}
-                  className="cursor-grab p-3 shadow-card"
-                >
-                  <p className="font-medium text-sm">{l.name}</p>
-                  {l.company && <p className="text-xs text-muted-foreground">{l.company}</p>}
-                </Card>
-              ))}
+          <div className="flex-1 space-y-2.5">
+            {leads.filter((l) => !l.stage_id).map((l) => renderCard(l))}
+            {leads.filter((l) => !l.stage_id).length === 0 && (
+              <div className="grid min-h-[90px] place-items-center rounded-xl border border-dashed border-border text-xs text-muted-foreground">
+                Solte o lead aqui
+              </div>
+            )}
           </div>
         </div>
       </div>
