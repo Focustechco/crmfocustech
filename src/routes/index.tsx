@@ -18,7 +18,6 @@ import {
   Headphones,
   GraduationCap,
   Settings2,
-  Sparkles,
   Search,
   Bell,
   Plus,

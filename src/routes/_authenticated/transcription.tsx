@@ -1,7 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo, useEffect } from "react";
+import {
+  createFileRoute } from "@tanstack/react-router";
+import { useState,
+  useMemo,
+  useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar,
+  AvatarFallback,
+  AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +18,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+  } from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -21,15 +26,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+  } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  } from "@/components/ui/dropdown-menu";
 import {
-  Sparkles,
   Search,
   Plus,
   Calendar,
@@ -58,6 +62,7 @@ import {
   Share2,
   Trophy,
   RotateCcw,
+  Handshake,
 } from "lucide-react";
 import { toast } from "sonner";
 import { TEAM_MEMBERS, TeamMember } from "./pipeline";
@@ -431,7 +436,7 @@ function TranscriptionPage() {
     },
     parceria: {
       label: "Parceria / Canal",
-      icon: Sparkles,
+      icon: Handshake,
       color: "text-orange-500",
       badgeColor: "bg-orange-500/10 text-orange-600 border-orange-500/20",
     },
@@ -576,7 +581,7 @@ function TranscriptionPage() {
         <div>
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-primary/10 text-primary">
-              <Sparkles className="h-6 w-6" />
+              <FileAudio className="h-6 w-6" />
             </div>
             <div>
               <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">
@@ -593,7 +598,7 @@ function TranscriptionPage() {
           onClick={() => setIsUploadModalOpen(true)}
           className="brand-gradient text-white gap-2 font-medium shadow-sm hover:opacity-95 cursor-pointer text-xs h-9"
         >
-          <Sparkles className="h-4 w-4 stroke-[2.5]" />
+          <FileAudio className="h-4 w-4 stroke-[2.5]" />
           + Processar Nova Reunião
         </Button>
       </div>
@@ -873,7 +878,7 @@ function TranscriptionPage() {
               {/* Seção 1: Resumo Executivo & Inteligência */}
               <div className="space-y-3">
                 <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-primary" />
+                  <Zap className="h-4 w-4 text-primary" />
                   Resumo Executivo Estruturado
                 </h3>
                 <div className="p-4 bg-muted/30 rounded-xl border border-border/60 space-y-2">
@@ -1064,7 +1069,7 @@ function TranscriptionPage() {
             </Card>
           ) : (
             <Card className="p-16 text-center border-dashed">
-              <Sparkles className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+              <FileAudio className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
               <h3 className="font-bold text-base">Nenhuma reunião selecionada</h3>
               <p className="text-xs text-muted-foreground mt-1">
                 Selecione uma chamada na coluna lateral ou faça o upload de uma nova transcrição.
@@ -1081,7 +1086,7 @@ function TranscriptionPage() {
         <DialogContent className="max-w-xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
+              <FileAudio className="h-5 w-5 text-primary" />
               Processar Transcrição com IA
             </DialogTitle>
             <DialogDescription>
@@ -1101,7 +1106,7 @@ function TranscriptionPage() {
                   { id: "proposta", label: "Proposta", icon: FileText },
                   { id: "fechamento", label: "Fechamento", icon: Trophy },
                   { id: "followup", label: "Follow-up", icon: RotateCcw },
-                  { id: "parceria", label: "Parceria", icon: Sparkles },
+                  { id: "parceria", label: "Parceria", icon: Handshake },
                 ].map((item) => (
                   <button
                     key={item.id}
@@ -1217,12 +1222,12 @@ function TranscriptionPage() {
             >
               {isProcessing ? (
                 <>
-                  <Sparkles className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                  <Zap className="h-3.5 w-3.5 mr-1.5 animate-spin" />
                   Processando com IA...
                 </>
               ) : (
                 <>
-                  <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                  <Zap className="h-3.5 w-3.5 mr-1.5" />
                   Processar e Estruturar
                 </>
               )}

@@ -44,7 +44,7 @@ import {
   Trash2,
   Video,
   MessageCircle,
-  Sparkles,
+  FileAudio,
   Zap,
   Globe,
   Clock,
@@ -551,7 +551,7 @@ export function SettingsPage() {
               <div className="flex items-center justify-between pt-3">
                 <div className="space-y-0.5">
                   <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-                    <Sparkles className="h-4 w-4 text-purple-500" /> Transcrições IA Processadas
+                    <FileAudio className="h-4 w-4 text-purple-500" /> Transcrições IA Processadas
                   </p>
                   <p className="text-xs text-muted-foreground">Avisar quando a IA estruturar o relatório da chamada com participantes e ações.</p>
                 </div>

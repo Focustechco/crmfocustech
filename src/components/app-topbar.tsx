@@ -10,7 +10,7 @@ import {
   CheckCheck,
   Trash2,
   Video,
-  Sparkles,
+  FileAudio,
   Trophy,
   CheckSquare,
   Users,
@@ -177,7 +177,7 @@ export function AppTopbar({ email }: { email?: string | null }) {
       case "tasks":
         return <Video className="h-4 w-4 text-emerald-500" />;
       case "transcription":
-        return <Sparkles className="h-4 w-4 text-purple-500" />;
+        return <FileAudio className="h-4 w-4 text-purple-500" />;
       case "clients":
         return <Trophy className="h-4 w-4 text-amber-500" />;
       case "pipeline":

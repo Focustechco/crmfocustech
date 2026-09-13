@@ -46,7 +46,8 @@ import {
   Video,
   ExternalLink,
   Clock,
-  Sparkles,
+  FileAudio,
+  Layers,
   MoreVertical,
   Trash2,
   Edit2,
@@ -564,7 +565,7 @@ export function TasksAndAgendaPage() {
     },
     alinhamento: {
       label: "Alinhamento Interno",
-      icon: Sparkles,
+      icon: Layers,
       color: "text-rose-500",
       badge: "bg-rose-500/10 text-rose-600 border-rose-500/20",
     },
@@ -1216,7 +1217,7 @@ export function TasksAndAgendaPage() {
                         }}
                         className="h-8 text-xs border-purple-500/30 text-purple-600 hover:bg-purple-500/10"
                       >
-                        <Sparkles className="h-3.5 w-3.5 mr-1 text-purple-500" />
+                        <FileAudio className="h-3.5 w-3.5 mr-1 text-purple-500" />
                         Transcrever
                       </Button>
 

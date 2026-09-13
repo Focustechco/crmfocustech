@@ -52,7 +52,6 @@ import {
   Presentation,
   UserCheck,
   Target,
-  Sparkles,
   ChevronLeft,
   ChevronRight,
   Maximize2,

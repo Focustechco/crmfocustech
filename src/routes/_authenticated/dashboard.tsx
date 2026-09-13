@@ -15,7 +15,7 @@ import {
   Layers,
   Award,
   ChevronRight,
-  Sparkles,
+  Zap,
 } from "lucide-react";
 import {
   AreaChart,
@@ -561,7 +561,7 @@ export function DashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="text-base font-bold flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-[#FF6B00]" />
+                <Zap className="h-4 w-4 text-[#FF6B00]" />
                 Oportunidades Recentes no Pipeline
               </CardTitle>
               <CardDescription className="text-xs mt-0.5">

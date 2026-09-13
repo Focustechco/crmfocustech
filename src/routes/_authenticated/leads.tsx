@@ -64,7 +64,7 @@ import {
   Filter,
   LayoutGrid,
   Rows3,
-  Sparkles,
+  Eye,
   CheckCircle2,
   Clock,
   Globe,
@@ -980,7 +980,7 @@ export function LeadsPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48 text-xs">
                         <DropdownMenuItem onClick={() => handleOpenDetail(lead)}>
-                          <Sparkles className="h-3.5 w-3.5 mr-2 text-[#FF6B00]" /> Visão 360° do Lead
+                          <Eye className="h-3.5 w-3.5 mr-2 text-[#FF6B00]" /> Visão 360° do Lead
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleOpenEditModal(lead)}>
                           <Edit2 className="h-3.5 w-3.5 mr-2" /> Editar Dados
@@ -1101,7 +1101,7 @@ export function LeadsPage() {
                       onClick={() => handleOpenDetail(lead)}
                       className="text-xs h-8 text-[#FF6B00] border-[#FF6B00]/40 hover:bg-[#FF6B00]/10 hover:text-[#FF6B00] cursor-pointer"
                     >
-                      <Sparkles className="h-3.5 w-3.5 mr-1" /> Visão 360°
+                      <Eye className="h-3.5 w-3.5 mr-1" /> Visão 360°
                     </Button>
                   </div>
                 </CardContent>
@@ -1226,7 +1226,7 @@ export function LeadsPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-44 text-xs">
                           <DropdownMenuItem onClick={() => handleOpenDetail(lead)}>
-                            <Sparkles className="h-3.5 w-3.5 mr-2 text-[#FF6B00]" /> Visão 360°
+                            <Eye className="h-3.5 w-3.5 mr-2 text-[#FF6B00]" /> Visão 360°
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleOpenEditModal(lead)}>
                             <Edit2 className="h-3.5 w-3.5 mr-2" /> Editar
