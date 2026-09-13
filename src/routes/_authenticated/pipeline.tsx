@@ -131,7 +131,7 @@ export const INITIAL_TAGS: TagItem[] = [
 ];
 
 // Equipe padrão
-const TEAM_MEMBERS: TeamMember[] = [
+export const TEAM_MEMBERS: TeamMember[] = [
   {
     id: "user-1",
     name: "Ana Laura Lima",
@@ -172,7 +172,7 @@ const STAGE_COLORS = [
 ];
 
 // Etapas do Funil
-const INITIAL_STAGES: PipelineStage[] = [
+export const INITIAL_STAGES: PipelineStage[] = [
   { id: "stage-1", name: "Em Desenvolvimento", color: "#FF6B00", position: 0 },
   { id: "stage-2", name: "Criar documentos", color: "#F97316", position: 1 },
   { id: "stage-3", name: "Criar documentos (revisão)", color: "#FB923C", position: 2 },
@@ -182,7 +182,7 @@ const INITIAL_STAGES: PipelineStage[] = [
 ];
 
 // Mock Relacional Inicial fiel à imagem
-const INITIAL_DEALS: DealItem[] = [
+export const INITIAL_DEALS: DealItem[] = [
   {
     id: "deal-1789",
     code: "#1789",
