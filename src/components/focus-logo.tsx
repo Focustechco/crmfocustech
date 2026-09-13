@@ -1,20 +1,16 @@
 import { cn } from "@/lib/utils";
 import foxLogo from "@/assets/fox-logo.png";
-import focusLogoFull from "@/assets/focus-logo-full.png";
-import focusLogoDark from "@/assets/focus-logo-dark.png";
 
 interface FocusLogoProps {
   className?: string;
   showText?: boolean;
   size?: "xs" | "sm" | "md" | "lg" | "xl";
-  variant?: "brand" | "image" | "icon";
 }
 
 export function FocusLogo({
   className,
   showText = true,
   size = "md",
-  variant = "brand",
 }: FocusLogoProps) {
   // Dimension mappings
   const iconSizes = {
