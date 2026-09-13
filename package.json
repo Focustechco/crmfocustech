@@ -8,6 +8,7 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
+    "deploy": "node -e \"fetch('https://api.vercel.com/v1/integrations/deploy/prj_J9tK4gEAgy6Df9PWwoo6zkncsvxh/7FPSKXhN3j',{method:'POST'}).then(r=>r.json()).then(console.log)\"",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
