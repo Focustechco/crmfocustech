@@ -26,6 +26,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 import { FocusLogo } from "./focus-logo";
 
 const mainItems = [
@@ -54,8 +55,8 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b">
-        <div className="flex h-16 items-center justify-center px-3">
-          <FocusLogo showText={!collapsed} />
+        <div className={cn("flex h-16 items-center transition-all duration-200", collapsed ? "justify-center px-0" : "justify-start px-3")}>
+          <FocusLogo showText={!collapsed} size={collapsed ? "sm" : "md"} />
         </div>
       </SidebarHeader>
 
