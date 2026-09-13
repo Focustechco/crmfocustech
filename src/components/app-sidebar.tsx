@@ -8,6 +8,7 @@ import {
   MessageCircle,
   Mail,
   Compass,
+  Sparkles,
   CreditCard,
   BarChart3,
   Boxes,
@@ -36,6 +37,7 @@ const mainItems = [
   { title: "Prospecção", url: "/deals", icon: Compass },
   { title: "Tarefas", url: "/tasks", icon: CheckSquare },
   { title: "Comercial OS", url: "/clients", icon: Target },
+  { title: "Transcrição", url: "/transcription", icon: Sparkles },
 ];
 
 const soonItems = [

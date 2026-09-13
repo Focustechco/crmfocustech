@@ -22,6 +22,7 @@ const getModuleTitle = (path: string) => {
   if (path.startsWith("/deals")) return "Prospecção";
   if (path.startsWith("/clients")) return "Comercial OS";
   if (path.startsWith("/tasks")) return "Tarefas";
+  if (path.startsWith("/transcription")) return "Transcrição";
   if (path.startsWith("/settings")) return "Configurações";
   return "Focus CRM";
 };
