@@ -711,10 +711,10 @@ export function PipelinePage() {
           </p>
         </div>
 
-        {/* Filtros, Alternador de Visualização e Botão Novo Negócio */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        {/* Filtros, Alternador de Visualização e Botão Novo Negócio na mesma linha */}
+        <div className="flex items-center gap-2 flex-wrap lg:flex-nowrap">
           {/* Alternador de Visualização: Ícones Apenas (Detalhado vs Resumido) */}
-          <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/80">
+          <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/80 shrink-0">
             <button
               type="button"
               onClick={() => handleSetCardViewMode("detailed")}
@@ -746,11 +746,11 @@ export function PipelinePage() {
           </div>
 
           {/* Responsável */}
-          <div className="w-[180px]">
+          <div className="w-[160px] shrink-0">
             <Select value={selectedResponsible} onValueChange={setSelectedResponsible}>
               <SelectTrigger className="h-9 bg-card text-xs">
                 <Users className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
-                <SelectValue placeholder="Todos os responsáveis" />
+                <SelectValue placeholder="Responsável" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos os responsáveis</SelectItem>
@@ -764,11 +764,11 @@ export function PipelinePage() {
           </div>
 
           {/* Fases */}
-          <div className="w-[150px]">
+          <div className="w-[140px] shrink-0">
             <Select value={selectedStageFilter} onValueChange={setSelectedStageFilter}>
               <SelectTrigger className="h-9 bg-card text-xs">
                 <Filter className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
-                <SelectValue placeholder="Todas as fases" />
+                <SelectValue placeholder="Fases" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas as fases</SelectItem>
@@ -782,7 +782,7 @@ export function PipelinePage() {
           </div>
 
           {/* Período */}
-          <div className="w-[140px]">
+          <div className="w-[130px] shrink-0">
             <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
               <SelectTrigger className="h-9 bg-card text-xs">
                 <CalendarDays className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
@@ -797,13 +797,15 @@ export function PipelinePage() {
             </Select>
           </div>
 
-          {/* Botão Novo Negócio */}
+          {/* Botão Novo Negócio: Ícone '+' na mesma linha */}
           <Button
+            size="icon"
             onClick={() => handleOpenCreateModal("stage-1")}
-            className="h-9 px-4 bg-[#FF6B00] hover:bg-[#E65C00] text-white font-medium shadow-sm gap-1.5 rounded-lg text-xs md:text-sm"
+            className="h-9 w-9 bg-[#FF6B00] hover:bg-[#E65C00] text-white rounded-lg shadow-sm shrink-0"
+            title="Novo negócio"
+            aria-label="Novo negócio"
           >
             <Plus className="h-4 w-4 stroke-[2.5]" />
-            Novo negócio
           </Button>
         </div>
       </div>
