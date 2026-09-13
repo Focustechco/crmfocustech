@@ -8,7 +8,9 @@ import {
   MessageCircle,
   Mail,
   Wallet,
-  Sparkles,
+  CreditCard,
+  BarChart3,
+  Boxes,
   Settings,
 } from "lucide-react";
 
@@ -38,7 +40,9 @@ const mainItems = [
 const soonItems = [
   { title: "WhatsApp", url: "#", icon: MessageCircle },
   { title: "E-mail", url: "#", icon: Mail },
-  { title: "Focus AI", url: "#", icon: Sparkles },
+  { title: "Focus Pay", url: "#", icon: CreditCard },
+  { title: "B.I Focus", url: "#", icon: BarChart3 },
+  { title: "ERP Focus", url: "#", icon: Boxes },
 ];
 
 export function AppSidebar() {

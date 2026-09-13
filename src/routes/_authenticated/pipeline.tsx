@@ -40,6 +40,8 @@ import {
   Trash2,
   Edit2,
   User,
+  Settings2,
+  Palette,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -112,6 +114,19 @@ const TEAM_MEMBERS: TeamMember[] = [
     avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80",
     role: "Vendedora Sênior",
   },
+];
+
+// Cores predefinidas para etapas
+const STAGE_COLORS = [
+  { label: "Laranja", value: "#FF6B00" },
+  { label: "Coral", value: "#F97316" },
+  { label: "Âmbar", value: "#F59E0B" },
+  { label: "Esmeralda", value: "#10B981" },
+  { label: "Azul", value: "#3B82F6" },
+  { label: "Índigo", value: "#6366F1" },
+  { label: "Rosa", value: "#EC4899" },
+  { label: "Roxo", value: "#8B5CF6" },
+  { label: "Grafite", value: "#475569" },
 ];
 
 // Etapas do Funil
@@ -335,7 +350,18 @@ const BRL = (num: number) =>
 
 export function PipelinePage() {
   const qc = useQueryClient();
-  const [stages] = useState<PipelineStage[]>(INITIAL_STAGES);
+  const [stages, setStages] = useState<PipelineStage[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("focus_crm_stages_store");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {}
+      }
+    }
+    return INITIAL_STAGES;
+  });
+
   const [deals, setDeals] = useState<DealItem[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("focus_crm_deals_store");
@@ -348,6 +374,14 @@ export function PipelinePage() {
     return INITIAL_DEALS;
   });
 
+  // Salvar estágios localmente
+  const saveStages = (updated: PipelineStage[]) => {
+    setStages(updated);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("focus_crm_stages_store", JSON.stringify(updated));
+    }
+  };
+
   // Filtros
   const [selectedResponsible, setSelectedResponsible] = useState<string>("all");
   const [selectedStageFilter, setSelectedStageFilter] = useState<string>("all");
@@ -358,12 +392,19 @@ export function PipelinePage() {
   const [draggingDealId, setDraggingDealId] = useState<string | null>(null);
   const [dragOverStageId, setDragOverStageId] = useState<string | null>(null);
 
-  // Modal de Criação / Edição Relacional
+  // Modal de Criação / Edição de Negócio
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingDealId, setEditingDealId] = useState<string | null>(null);
   const [modalStageId, setModalStageId] = useState<string>("stage-1");
 
-  // Form State
+  // Modal de Criação / Edição de Coluna (Etapa)
+  const [isStageModalOpen, setIsStageModalOpen] = useState(false);
+  const [editingStageId, setEditingStageId] = useState<string | null>(null);
+  const [stageName, setStageName] = useState("");
+  const [stageColor, setStageColor] = useState("#FF6B00");
+  const [stageInsertPosition, setStageInsertPosition] = useState<number>(0);
+
+  // Form State do Negócio
   const [formCode, setFormCode] = useState("");
   const [formTitle, setFormTitle] = useState("");
   const [formValue, setFormValue] = useState("");
@@ -376,13 +417,69 @@ export function PipelinePage() {
   const [formWhatsapp, setFormWhatsapp] = useState("");
   const [formNotes, setFormNotes] = useState("");
 
-  // Persistir negócios localmente e sincronizar
+  // Persistir negócios localmente
   const saveDeals = (updated: DealItem[]) => {
     setDeals(updated);
     if (typeof window !== "undefined") {
       localStorage.setItem("focus_crm_deals_store", JSON.stringify(updated));
     }
   };
+
+  // Abrir Modal de Edição de Etapa
+  const handleOpenEditStageModal = (stage: PipelineStage) => {
+    setEditingStageId(stage.id);
+    setStageName(stage.name);
+    setStageColor(stage.color || "#FF6B00");
+    setIsStageModalOpen(true);
+  };
+
+  // Abrir Modal de Nova Etapa
+  const handleOpenAddStageModal = (position?: number) => {
+    setEditingStageId(null);
+    setStageName("");
+    setStageColor("#FF6B00");
+    setStageInsertPosition(position ?? stages.length);
+    setIsStageModalOpen(true);
+  };
+
+  // Salvar Etapa (Criar ou Atualizar)
+  const handleSaveStage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stageName.trim()) {
+      return toast.error("Informe o nome da etapa");
+    }
+
+    if (editingStageId) {
+      const updated = stages.map((s) =>
+        s.id === editingStageId ? { ...s, name: stageName, color: stageColor } : s
+      );
+      saveStages(updated);
+      toast.success("Coluna atualizada!");
+    } else {
+      const newStage: PipelineStage = {
+        id: `stage-${Date.now()}`,
+        name: stageName,
+        color: stageColor,
+        position: stageInsertPosition,
+      };
+      const updated = [...stages, newStage];
+      saveStages(updated);
+      toast.success("Nova coluna criada no funil!");
+    }
+
+    setIsStageModalOpen(false);
+  };
+
+  // Excluir Etapa
+  const handleDeleteStage = (stageId: string) => {
+    if (stages.length <= 1) {
+      return toast.error("O funil precisa ter pelo menos 1 coluna");
+    }
+    const updated = stages.filter((s) => s.id !== stageId);
+    saveStages(updated);
+    toast.success("Coluna removida do funil");
+  };
+
 
   // Buscar clientes relacionais do Supabase se existirem
   const { data: dbLeads = [] } = useQuery({
@@ -729,15 +826,46 @@ export function PipelinePage() {
                   </div>
                 </div>
 
-                {/* Botão + Rápido na Coluna */}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleOpenCreateModal(stage.id)}
-                  className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-background rounded-full"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                </Button>
+                {/* Botões de Ação na Coluna */}
+                <div className="flex items-center gap-0.5">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleOpenCreateModal(stage.id)}
+                    className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-background rounded-full"
+                    title="Adicionar negócio nesta fase"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </Button>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-background rounded-full"
+                        title="Opções da coluna"
+                      >
+                        <Settings2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem onClick={() => handleOpenEditStageModal(stage)}>
+                        <Edit2 className="h-3.5 w-3.5 mr-2" /> Editar coluna
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleOpenAddStageModal(stage.position + 1)}>
+                        <Plus className="h-3.5 w-3.5 mr-2" /> Inserir coluna
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleDeleteStage(stage.id)}
+                        className="text-destructive focus:text-destructive"
+                        disabled={stages.length <= 1}
+                      >
+                        <Trash2 className="h-3.5 w-3.5 mr-2" /> Excluir coluna
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
 
               {/* Lista de Cards de Negócio */}
@@ -885,9 +1013,21 @@ export function PipelinePage() {
             </div>
           );
         })}
+
+        {/* Botão para Criar Nova Coluna / Etapa no Final */}
+        <button
+          type="button"
+          onClick={() => handleOpenAddStageModal(stages.length)}
+          className="flex flex-col items-center justify-center w-[240px] shrink-0 min-h-[140px] rounded-2xl border-2 border-dashed border-border/80 hover:border-[#FF6B00] bg-muted/20 hover:bg-card text-muted-foreground hover:text-[#FF6B00] gap-2 font-semibold text-xs transition-all cursor-pointer p-5 group"
+        >
+          <div className="h-9 w-9 rounded-full bg-[#FF6B00]/10 text-[#FF6B00] group-hover:bg-[#FF6B00] group-hover:text-white flex items-center justify-center transition-colors shadow-sm">
+            <Plus className="h-5 w-5 stroke-[2.5]" />
+          </div>
+          <span>+ Nova Coluna / Etapa</span>
+        </button>
       </div>
 
-      {/* 4. Modal de Criação / Edição Relacional */}
+      {/* 4. Modal de Criação / Edição de Negócio */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -1109,7 +1249,88 @@ export function PipelinePage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* 5. Modal de Criação / Edição de Coluna (Etapa) */}
+      <Dialog open={isStageModalOpen} onOpenChange={setIsStageModalOpen}>
+        <DialogContent className="sm:max-w-[420px]">
+          <DialogHeader>
+            <DialogTitle className="font-display text-base font-bold flex items-center gap-2">
+              <Palette className="h-4 w-4 text-[#FF6B00]" />
+              {editingStageId ? "Editar Coluna do Funil" : "Nova Coluna no Funil"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveStage} className="space-y-4 pt-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="stage-name" className="text-xs">Nome da Etapa / Coluna *</Label>
+              <Input
+                id="stage-name"
+                placeholder="Ex: Em Qualificação"
+                required
+                value={stageName}
+                onChange={(e) => setStageName(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs">Cor da Coluna</Label>
+              <div className="grid grid-cols-5 gap-2">
+                {STAGE_COLORS.map((c) => (
+                  <button
+                    key={c.value}
+                    type="button"
+                    onClick={() => setStageColor(c.value)}
+                    className={cn(
+                      "flex items-center justify-center h-8 rounded-lg border text-[11px] font-bold text-white transition-all cursor-pointer",
+                      stageColor === c.value ? "ring-2 ring-foreground scale-105" : "opacity-80 hover:opacity-100"
+                    )}
+                    style={{ backgroundColor: c.value }}
+                    title={c.label}
+                  >
+                    {stageColor === c.value && "✓"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <DialogFooter className="pt-2 flex justify-between items-center sm:justify-between">
+              {editingStageId && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    handleDeleteStage(editingStageId);
+                    setIsStageModalOpen(false);
+                  }}
+                  className="text-destructive hover:bg-destructive/10 text-xs"
+                  disabled={stages.length <= 1}
+                >
+                  <Trash2 className="h-3.5 w-3.5 mr-1" /> Excluir
+                </Button>
+              )}
+              <div className="flex gap-2 ml-auto">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsStageModalOpen(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="bg-[#FF6B00] hover:bg-[#E65C00] text-white"
+                >
+                  {editingStageId ? "Salvar Coluna" : "Criar Coluna"}
+                </Button>
+              </div>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+
 
