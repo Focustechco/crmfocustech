@@ -9,6 +9,18 @@ import { ThemeProvider } from "@/lib/theme";
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async () => {
+    if (typeof window !== "undefined") {
+      const isAdminMode = localStorage.getItem("focus_crm_admin_mode");
+      if (isAdminMode) {
+        return {
+          user: {
+            id: "00000000-0000-0000-0000-000000000001",
+            email: "admin@focustech.com",
+            user_metadata: { full_name: "Administrador Focus Tech", role: "admin" },
+          },
+        };
+      }
+    }
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth" });
     return { user: data.user };
@@ -22,9 +34,17 @@ function AuthenticatedLayout() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const isAdminMode = localStorage.getItem("focus_crm_admin_mode");
+    if (isAdminMode) {
+      setEmail("admin@focustech.com");
+      return;
+    }
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (!session?.user) navigate({ to: "/auth", replace: true });
-      else setEmail(session.user.email ?? null);
+      if (!session?.user && !localStorage.getItem("focus_crm_admin_mode")) {
+        navigate({ to: "/auth", replace: true });
+      } else {
+        setEmail(session?.user?.email ?? null);
+      }
     });
     return () => sub.subscription.unsubscribe();
   }, [navigate]);

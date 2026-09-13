@@ -22,6 +22,7 @@ export function AppTopbar({ email }: { email?: string | null }) {
   const initials = (email?.[0] ?? "F").toUpperCase();
 
   const signOut = async () => {
+    localStorage.removeItem("focus_crm_admin_mode");
     await supabase.auth.signOut();
     navigate({ to: "/auth" });
   };

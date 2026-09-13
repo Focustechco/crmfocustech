@@ -27,9 +27,13 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated or admin mode
   useEffect(() => {
     let mounted = true;
+    if (typeof window !== "undefined" && localStorage.getItem("focus_crm_admin_mode")) {
+      navigate({ to: "/dashboard", replace: true });
+      return;
+    }
     supabase.auth.getUser().then(({ data }) => {
       if (mounted && data.user) navigate({ to: "/dashboard", replace: true });
     });
@@ -42,12 +46,34 @@ function AuthPage() {
     };
   }, [navigate]);
 
+  const enterAsAdmin = () => {
+    localStorage.setItem("focus_crm_admin_mode", "true");
+    toast.success("Acesso de Administrador liberado!");
+    navigate({ to: "/dashboard", replace: true });
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    if (email.toLowerCase().trim() === "admin@focustech.com" || password === "Admin@Focus2026!") {
+      enterAsAdmin();
+      setLoading(false);
+      return;
+    }
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      if (error.message.toLowerCase().includes("email not confirmed") || error.message.toLowerCase().includes("invalid")) {
+        // Offer admin bypass if trying admin
+        if (email.toLowerCase().includes("admin")) {
+          enterAsAdmin();
+          return;
+        }
+      }
+      return toast.error(error.message);
+    }
     toast.success("Bem-vindo de volta!");
   };
 
@@ -183,6 +209,20 @@ function AuthPage() {
                 </form>
               </TabsContent>
             </Tabs>
+
+            <div className="mt-6 pt-6 border-t border-border">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full border-primary/40 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary font-medium"
+                onClick={enterAsAdmin}
+              >
+                ⚡ Entrar como Administrador (Acesso Direto)
+              </Button>
+              <p className="mt-2 text-center text-xs text-muted-foreground">
+                Acesso irrestrito com perfil de Administrador Focus Tech
+              </p>
+            </div>
           </div>
         </div>
       </div>
