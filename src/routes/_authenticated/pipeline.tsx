@@ -885,140 +885,148 @@ export function PipelinePage() {
           </p>
         </div>
 
-        {/* Filtros, Alternador de Visualização, Gerenciador de Tags e Botão Novo Negócio */}
-        <div className="flex items-center gap-2 flex-wrap lg:flex-nowrap">
-          {/* Alternador de Visualização: Ícones Apenas (Detalhado vs Resumido) */}
-          <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/80 shrink-0">
-            <button
-              type="button"
-              onClick={() => handleSetCardViewMode("detailed")}
-              className={cn(
-                "h-8 w-8 text-xs font-medium rounded-md flex items-center justify-center transition-all cursor-pointer",
-                cardViewMode === "detailed"
-                  ? "bg-background text-foreground shadow-xs"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-              title="Visualização Detalhada"
-              aria-label="Visualização Detalhada"
+        {/* Filtros e Ações: Máximo 2 Linhas no Mobile e 1 Linha Flex no Desktop */}
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-2 w-full lg:w-auto">
+          {/* Linha 1 no Mobile: 3 Seletores de Filtro (Etiqueta, Responsável, Fases) */}
+          <div className="grid grid-cols-3 gap-1.5 w-full lg:w-auto lg:flex lg:items-center lg:gap-2">
+            {/* Filtro por Etiqueta */}
+            <div className="w-full lg:w-[140px] shrink-0">
+              <Select value={selectedTagFilter} onValueChange={setSelectedTagFilter}>
+                <SelectTrigger className="h-8 sm:h-9 bg-card text-xs px-2">
+                  <Tag className="mr-1 h-3.5 w-3.5 text-[#FF6B00] shrink-0" />
+                  <SelectValue placeholder="Etiquetas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as etiquetas</SelectItem>
+                  {tags.map((t) => (
+                    <SelectItem key={t.id} value={t.id}>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: t.color }} />
+                        <span>{t.name}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Responsável */}
+            <div className="w-full lg:w-[150px] shrink-0">
+              <Select value={selectedResponsible} onValueChange={setSelectedResponsible}>
+                <SelectTrigger className="h-8 sm:h-9 bg-card text-xs px-2">
+                  <Users className="mr-1 h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  <SelectValue placeholder="Responsável" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os responsáveis</SelectItem>
+                  {TEAM_MEMBERS.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>
+                      {m.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Fases */}
+            <div className="w-full lg:w-[130px] shrink-0">
+              <Select value={selectedStageFilter} onValueChange={setSelectedStageFilter}>
+                <SelectTrigger className="h-8 sm:h-9 bg-card text-xs px-2">
+                  <Filter className="mr-1 h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  <SelectValue placeholder="Fases" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as fases</SelectItem>
+                  {stages.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>
+                      {s.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Linha 2 no Mobile / Continuação da Toolbar no Desktop */}
+          <div className="flex items-center justify-between lg:justify-start gap-1.5 w-full lg:w-auto">
+            <div className="flex items-center gap-1.5">
+              {/* Alternador de Visualização: Detalhado vs Resumido */}
+              <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/80 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => handleSetCardViewMode("detailed")}
+                  className={cn(
+                    "h-7 w-7 sm:h-8 sm:w-8 text-xs font-medium rounded-md flex items-center justify-center transition-all cursor-pointer",
+                    cardViewMode === "detailed"
+                      ? "bg-background text-foreground shadow-xs"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                  title="Visualização Detalhada"
+                  aria-label="Visualização Detalhada"
+                >
+                  <LayoutGrid className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSetCardViewMode("compact")}
+                  className={cn(
+                    "h-7 w-7 sm:h-8 sm:w-8 text-xs font-medium rounded-md flex items-center justify-center transition-all cursor-pointer",
+                    cardViewMode === "compact"
+                      ? "bg-background text-foreground shadow-xs"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                  title="Visualização Resumida"
+                  aria-label="Visualização Resumida"
+                >
+                  <Rows3 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                </button>
+              </div>
+
+              {/* Botão Ocultar / Mostrar Valores Financeiros */}
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={toggleHideFinancialValues}
+                className={cn(
+                  "h-8 w-8 sm:h-9 sm:w-9 bg-card border-border/80 shrink-0 transition-colors cursor-pointer",
+                  hideFinancialValues
+                    ? "text-muted-foreground border-border hover:text-foreground"
+                    : "text-foreground hover:text-[#FF6B00]"
+                )}
+                title={hideFinancialValues ? "Mostrar valores financeiros" : "Ocultar valores financeiros"}
+                aria-label={hideFinancialValues ? "Mostrar valores financeiros" : "Ocultar valores financeiros"}
+              >
+                {hideFinancialValues ? (
+                  <EyeOff className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
+                ) : (
+                  <Eye className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground hover:text-[#FF6B00]" />
+                )}
+              </Button>
+
+              {/* Botão Gerenciar Etiquetas */}
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => handleOpenCreateTagModal()}
+                className="h-8 w-8 sm:h-9 sm:w-9 bg-card border-border/80 text-foreground hover:text-[#FF6B00] shrink-0 cursor-pointer"
+                title="Gerenciar etiquetas"
+                aria-label="Gerenciar etiquetas"
+              >
+                <Tag className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#FF6B00]" />
+              </Button>
+            </div>
+
+            {/* Botão Novo Negócio */}
+            <Button
+              onClick={() => handleOpenCreateModal("stage-1")}
+              className="h-8 sm:h-9 bg-[#FF6B00] hover:bg-[#E65C00] text-white rounded-lg shadow-xs text-xs px-2.5 sm:px-3 font-medium shrink-0 cursor-pointer"
+              title="Novo negócio"
+              aria-label="Novo negócio"
             >
-              <LayoutGrid className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSetCardViewMode("compact")}
-              className={cn(
-                "h-8 w-8 text-xs font-medium rounded-md flex items-center justify-center transition-all cursor-pointer",
-                cardViewMode === "compact"
-                  ? "bg-background text-foreground shadow-xs"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-              title="Visualização Resumida"
-              aria-label="Visualização Resumida"
-            >
-              <Rows3 className="h-4 w-4" />
-            </button>
+              <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 stroke-[2.5]" />
+              <span>+ Negócio</span>
+            </Button>
           </div>
-
-          {/* Filtro por Etiqueta */}
-          <div className="w-[150px] shrink-0">
-            <Select value={selectedTagFilter} onValueChange={setSelectedTagFilter}>
-              <SelectTrigger className="h-9 bg-card text-xs">
-                <Tag className="mr-1.5 h-3.5 w-3.5 text-[#FF6B00]" />
-                <SelectValue placeholder="Etiquetas" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas as etiquetas</SelectItem>
-                {tags.map((t) => (
-                  <SelectItem key={t.id} value={t.id}>
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: t.color }} />
-                      <span>{t.name}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Responsável */}
-          <div className="w-[155px] shrink-0">
-            <Select value={selectedResponsible} onValueChange={setSelectedResponsible}>
-              <SelectTrigger className="h-9 bg-card text-xs">
-                <Users className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
-                <SelectValue placeholder="Responsável" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os responsáveis</SelectItem>
-                {TEAM_MEMBERS.map((m) => (
-                  <SelectItem key={m.id} value={m.id}>
-                    {m.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Fases */}
-          <div className="w-[135px] shrink-0">
-            <Select value={selectedStageFilter} onValueChange={setSelectedStageFilter}>
-              <SelectTrigger className="h-9 bg-card text-xs">
-                <Filter className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
-                <SelectValue placeholder="Fases" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas as fases</SelectItem>
-                {stages.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
-                    {s.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Botão Ocultar / Mostrar Valores Financeiros: Minimalista apenas Ícone */}
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={toggleHideFinancialValues}
-            className={cn(
-              "h-9 w-9 bg-card border-border/80 shrink-0 transition-colors cursor-pointer",
-              hideFinancialValues
-                ? "text-muted-foreground border-border hover:text-foreground"
-                : "text-foreground hover:text-[#FF6B00]"
-            )}
-            title={hideFinancialValues ? "Mostrar valores financeiros" : "Ocultar valores financeiros"}
-            aria-label={hideFinancialValues ? "Mostrar valores financeiros" : "Ocultar valores financeiros"}
-          >
-            {hideFinancialValues ? (
-              <EyeOff className="h-4 w-4 text-muted-foreground" />
-            ) : (
-              <Eye className="h-4 w-4 text-muted-foreground hover:text-[#FF6B00]" />
-            )}
-          </Button>
-
-          {/* Botão Gerenciar Etiquetas: Apenas Ícone */}
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => handleOpenCreateTagModal()}
-            className="h-9 w-9 bg-card border-border/80 text-foreground hover:text-[#FF6B00] shrink-0"
-            title="Gerenciar etiquetas"
-            aria-label="Gerenciar etiquetas"
-          >
-            <Tag className="h-4 w-4 text-[#FF6B00]" />
-          </Button>
-
-          {/* Botão Novo Negócio: Ícone '+' na mesma linha */}
-          <Button
-            size="icon"
-            onClick={() => handleOpenCreateModal("stage-1")}
-            className="h-9 w-9 bg-[#FF6B00] hover:bg-[#E65C00] text-white rounded-lg shadow-sm shrink-0"
-            title="Novo negócio"
-            aria-label="Novo negócio"
-          >
-            <Plus className="h-4 w-4 stroke-[2.5]" />
-          </Button>
         </div>
       </div>
 

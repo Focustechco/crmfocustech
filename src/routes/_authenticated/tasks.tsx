@@ -925,29 +925,29 @@ export function TasksAndAgendaPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap ml-auto md:ml-0">
+        <div className="grid grid-cols-3 gap-1.5 sm:flex sm:items-center sm:gap-2 w-full sm:w-auto">
           <Button
             onClick={() => setOpenMeetingModal(true)}
-            className="bg-[#FF6B00] hover:bg-[#E65C00] text-white shadow-xs"
+            className="bg-[#FF6B00] hover:bg-[#E65C00] text-white shadow-xs h-8 sm:h-9 text-xs px-2 sm:px-3 font-medium cursor-pointer"
           >
-            <Video className="h-4 w-4 mr-1.5" />
-            + Agendar Reunião
+            <Video className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5 shrink-0" />
+            <span>+ Reunião</span>
           </Button>
           <Button
             onClick={() => setOpenTaskModal(true)}
             variant="outline"
-            className="border-border hover:bg-muted"
+            className="border-border hover:bg-muted h-8 sm:h-9 text-xs px-2 sm:px-3 font-medium cursor-pointer"
           >
-            <CheckSquare className="h-4 w-4 mr-1.5 text-blue-500" />
-            + Nova Tarefa
+            <CheckSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5 text-blue-500 shrink-0" />
+            <span>+ Tarefa</span>
           </Button>
           <Button
             onClick={() => setOpenGoalModal(true)}
             variant="outline"
-            className="border-border hover:bg-muted"
+            className="border-border hover:bg-muted h-8 sm:h-9 text-xs px-2 sm:px-3 font-medium cursor-pointer"
           >
-            <Target className="h-4 w-4 mr-1.5 text-emerald-500" />
-            + Definir Meta
+            <Target className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5 text-emerald-500 shrink-0" />
+            <span>+ Meta</span>
           </Button>
         </div>
       </div>
@@ -1037,25 +1037,26 @@ export function TasksAndAgendaPage() {
         </div>
 
         {/* ABA 1: AGENDA */}
-        <TabsContent value="agenda" className="space-y-6">
-          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-muted/30 p-3 rounded-lg border">
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="relative min-w-[220px]">
+        <TabsContent value="agenda" className="space-y-4">
+          <div className="flex flex-col gap-2 bg-muted/30 p-2.5 sm:p-3 rounded-lg border">
+            {/* Linha 1: Busca + Filtro de Tempo */}
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1 min-w-0">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Buscar por reunião, lead ou empresa..."
                   value={meetingSearch}
                   onChange={(e) => setMeetingSearch(e.target.value)}
-                  className="pl-8 bg-background h-9 text-xs"
+                  className="pl-8 bg-background h-8 sm:h-9 text-xs"
                 />
               </div>
 
-              <div className="flex items-center bg-background rounded-md border p-0.5">
+              <div className="flex items-center bg-background rounded-md border p-0.5 shrink-0">
                 <Button
                   size="sm"
                   variant={meetingTimeFilter === "today" ? "default" : "ghost"}
                   onClick={() => setMeetingTimeFilter("today")}
-                  className={meetingTimeFilter === "today" ? "bg-[#FF6B00] text-white h-7 text-xs" : "h-7 text-xs"}
+                  className={meetingTimeFilter === "today" ? "bg-[#FF6B00] text-white h-7 text-xs px-2 sm:px-2.5 cursor-pointer" : "h-7 text-xs px-2 sm:px-2.5 cursor-pointer"}
                 >
                   Hoje
                 </Button>
@@ -1063,7 +1064,7 @@ export function TasksAndAgendaPage() {
                   size="sm"
                   variant={meetingTimeFilter === "week" ? "default" : "ghost"}
                   onClick={() => setMeetingTimeFilter("week")}
-                  className={meetingTimeFilter === "week" ? "bg-[#FF6B00] text-white h-7 text-xs" : "h-7 text-xs"}
+                  className={meetingTimeFilter === "week" ? "bg-[#FF6B00] text-white h-7 text-xs px-2 sm:px-2.5 cursor-pointer" : "h-7 text-xs px-2 sm:px-2.5 cursor-pointer"}
                 >
                   7 Dias
                 </Button>
@@ -1071,14 +1072,17 @@ export function TasksAndAgendaPage() {
                   size="sm"
                   variant={meetingTimeFilter === "all" ? "default" : "ghost"}
                   onClick={() => setMeetingTimeFilter("all")}
-                  className={meetingTimeFilter === "all" ? "bg-[#FF6B00] text-white h-7 text-xs" : "h-7 text-xs"}
+                  className={meetingTimeFilter === "all" ? "bg-[#FF6B00] text-white h-7 text-xs px-2 sm:px-2.5 cursor-pointer" : "h-7 text-xs px-2 sm:px-2.5 cursor-pointer"}
                 >
                   Todas
                 </Button>
               </div>
+            </div>
 
+            {/* Linha 2: Responsável + Contador */}
+            <div className="flex items-center justify-between gap-2">
               <Select value={meetingHostFilter} onValueChange={setMeetingHostFilter}>
-                <SelectTrigger className="w-[180px] h-9 text-xs bg-background">
+                <SelectTrigger className="w-full sm:w-[220px] h-8 text-xs bg-background">
                   <SelectValue placeholder="Responsável" />
                 </SelectTrigger>
                 <SelectContent>
@@ -1090,11 +1094,11 @@ export function TasksAndAgendaPage() {
                   ))}
                 </SelectContent>
               </Select>
-            </div>
 
-            <span className="text-xs text-muted-foreground self-center">
-              Mostrando <strong>{filteredMeetings.length}</strong> compromisso(s)
-            </span>
+              <span className="text-xs text-muted-foreground shrink-0 hidden sm:inline-block">
+                Mostrando <strong>{filteredMeetings.length}</strong> compromisso(s)
+              </span>
+            </div>
           </div>
 
           {filteredMeetings.length === 0 ? (
@@ -1269,25 +1273,26 @@ export function TasksAndAgendaPage() {
         </TabsContent>
 
         {/* ABA 2: CHECKLIST */}
-        <TabsContent value="checklist" className="space-y-6">
-          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-muted/30 p-3 rounded-lg border">
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="relative min-w-[200px]">
+        <TabsContent value="checklist" className="space-y-4">
+          <div className="flex flex-col gap-2 bg-muted/30 p-2.5 sm:p-3 rounded-lg border">
+            {/* Linha 1: Busca + Filtro de Status */}
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1 min-w-0">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Buscar tarefa ou subitem..."
                   value={taskSearch}
                   onChange={(e) => setTaskSearch(e.target.value)}
-                  className="pl-8 bg-background h-9 text-xs"
+                  className="pl-8 bg-background h-8 sm:h-9 text-xs"
                 />
               </div>
 
-              <div className="flex items-center bg-background rounded-md border p-0.5">
+              <div className="flex items-center bg-background rounded-md border p-0.5 shrink-0">
                 <Button
                   size="sm"
                   variant={taskStatusFilter === "pending" ? "default" : "ghost"}
                   onClick={() => setTaskStatusFilter("pending")}
-                  className={taskStatusFilter === "pending" ? "bg-blue-600 text-white h-7 text-xs" : "h-7 text-xs"}
+                  className={taskStatusFilter === "pending" ? "bg-blue-600 text-white h-7 text-xs px-2 cursor-pointer" : "h-7 text-xs px-2 cursor-pointer"}
                 >
                   Pendentes
                 </Button>
@@ -1295,7 +1300,7 @@ export function TasksAndAgendaPage() {
                   size="sm"
                   variant={taskStatusFilter === "done" ? "default" : "ghost"}
                   onClick={() => setTaskStatusFilter("done")}
-                  className={taskStatusFilter === "done" ? "bg-emerald-600 text-white h-7 text-xs" : "h-7 text-xs"}
+                  className={taskStatusFilter === "done" ? "bg-emerald-600 text-white h-7 text-xs px-2 cursor-pointer" : "h-7 text-xs px-2 cursor-pointer"}
                 >
                   Concluídas
                 </Button>
@@ -1303,58 +1308,63 @@ export function TasksAndAgendaPage() {
                   size="sm"
                   variant={taskStatusFilter === "all" ? "default" : "ghost"}
                   onClick={() => setTaskStatusFilter("all")}
-                  className={taskStatusFilter === "all" ? "bg-[#FF6B00] text-white h-7 text-xs" : "h-7 text-xs"}
+                  className={taskStatusFilter === "all" ? "bg-[#FF6B00] text-white h-7 text-xs px-2 cursor-pointer" : "h-7 text-xs px-2 cursor-pointer"}
                 >
                   Todas
                 </Button>
               </div>
-
-              <Select value={taskCategoryFilter} onValueChange={setTaskCategoryFilter}>
-                <SelectTrigger className="w-[140px] h-9 text-xs bg-background">
-                  <SelectValue placeholder="Categoria" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas Categorias</SelectItem>
-                  {Object.entries(CATEGORY_CONFIG).map(([key, val]) => (
-                    <SelectItem key={key} value={key}>
-                      {val.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={taskPriorityFilter} onValueChange={setTaskPriorityFilter}>
-                <SelectTrigger className="w-[130px] h-9 text-xs bg-background">
-                  <SelectValue placeholder="Prioridade" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas Prioridades</SelectItem>
-                  {Object.entries(PRIORITY_CONFIG).map(([key, val]) => (
-                    <SelectItem key={key} value={key}>
-                      {val.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={taskAssigneeFilter} onValueChange={setTaskAssigneeFilter}>
-                <SelectTrigger className="w-[150px] h-9 text-xs bg-background">
-                  <SelectValue placeholder="Responsável" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos Responsáveis</SelectItem>
-                  {TEAM_MEMBERS.map((m) => (
-                    <SelectItem key={m.id} value={m.id}>
-                      {m.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
 
-            <span className="text-xs text-muted-foreground self-center">
-              <strong>{filteredTasks.length}</strong> item(ns)
-            </span>
+            {/* Linha 2: 3 Seletores (Categoria, Prioridade, Responsável) + Contador */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="grid grid-cols-3 gap-1.5 flex-1 min-w-0">
+                <Select value={taskCategoryFilter} onValueChange={setTaskCategoryFilter}>
+                  <SelectTrigger className="w-full h-8 text-xs bg-background px-2">
+                    <SelectValue placeholder="Categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas Categorias</SelectItem>
+                    {Object.entries(CATEGORY_CONFIG).map(([key, val]) => (
+                      <SelectItem key={key} value={key}>
+                        {val.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={taskPriorityFilter} onValueChange={setTaskPriorityFilter}>
+                  <SelectTrigger className="w-full h-8 text-xs bg-background px-2">
+                    <SelectValue placeholder="Prioridade" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas Prioridades</SelectItem>
+                    {Object.entries(PRIORITY_CONFIG).map(([key, val]) => (
+                      <SelectItem key={key} value={key}>
+                        {val.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={taskAssigneeFilter} onValueChange={setTaskAssigneeFilter}>
+                  <SelectTrigger className="w-full h-8 text-xs bg-background px-2">
+                    <SelectValue placeholder="Responsável" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos Responsáveis</SelectItem>
+                    {TEAM_MEMBERS.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>
+                        {m.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <span className="text-xs text-muted-foreground shrink-0 hidden sm:inline-block">
+                <strong>{filteredTasks.length}</strong> item(ns)
+              </span>
+            </div>
           </div>
 
           {filteredTasks.length === 0 ? (
@@ -1502,11 +1512,12 @@ export function TasksAndAgendaPage() {
         </TabsContent>
 
         {/* ABA 3: METAS */}
-        <TabsContent value="goals" className="space-y-6">
-          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-muted/30 p-3 rounded-lg border">
-            <div className="flex items-center gap-3">
+        <TabsContent value="goals" className="space-y-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 bg-muted/30 p-2.5 sm:p-3 rounded-lg border">
+            {/* Linha 1 no mobile: Seletor de Usuário + Badge Período */}
+            <div className="flex items-center gap-2 flex-1 min-w-0">
               <Select value={goalUserFilter} onValueChange={setGoalUserFilter}>
-                <SelectTrigger className="w-[200px] h-9 text-xs bg-background">
+                <SelectTrigger className="w-full sm:w-[200px] h-8 sm:h-9 text-xs bg-background">
                   <SelectValue placeholder="Filtrar por Usuário" />
                 </SelectTrigger>
                 <SelectContent>
@@ -1519,17 +1530,19 @@ export function TasksAndAgendaPage() {
                 </SelectContent>
               </Select>
 
-              <Badge variant="outline" className="bg-background text-xs py-1 px-2.5">
-                Mês Atual: {new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}
+              <Badge variant="outline" className="bg-background text-[11px] py-1 px-2 shrink-0">
+                {new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}
               </Badge>
             </div>
 
+            {/* Linha 2 no mobile (ou inline no desktop): Botão de Ação */}
             <Button
               onClick={() => setOpenGoalModal(true)}
               size="sm"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 text-xs shadow-xs"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 sm:h-9 text-xs shadow-xs shrink-0 cursor-pointer"
             >
-              <Target className="h-3.5 w-3.5 mr-1" /> Atribuir Nova Meta
+              <Target className="h-3.5 w-3.5 mr-1" />
+              <span>+ Meta</span>
             </Button>
           </div>
 
