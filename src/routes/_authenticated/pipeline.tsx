@@ -1054,9 +1054,11 @@ export function PipelinePage() {
                         ({stat.count})
                       </span>
                     </h3>
-                    <p className="text-xs font-bold text-[#FF6B00]">
-                      {hideFinancialValues ? "••••••" : BRL(stat.totalValue)}
-                    </p>
+                    {!hideFinancialValues && (
+                      <p className="text-xs font-bold text-[#FF6B00]">
+                        {BRL(stat.totalValue)}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -1176,9 +1178,11 @@ export function PipelinePage() {
                         >
                           {deal.title}
                         </h4>
-                        <span className="font-bold text-foreground text-xs shrink-0">
-                          {hideFinancialValues ? "••••••" : BRL(deal.value)}
-                        </span>
+                        {!hideFinancialValues && (
+                          <span className="font-bold text-foreground text-xs shrink-0">
+                            {BRL(deal.value)}
+                          </span>
+                        )}
                       </div>
 
                       <p className="text-[11px] text-muted-foreground truncate mt-0.5">
@@ -1278,9 +1282,11 @@ export function PipelinePage() {
                       >
                         {deal.title}
                       </h4>
-                      <p className="text-sm font-extrabold text-foreground mt-1">
-                        {hideFinancialValues ? "••••••" : BRL(deal.value)}
-                      </p>
+                      {!hideFinancialValues && (
+                        <p className="text-sm font-extrabold text-foreground mt-1">
+                          {BRL(deal.value)}
+                        </p>
+                      )}
 
                       {/* Contato e Empresa */}
                       <div className="mt-2 text-xs text-muted-foreground leading-snug">
