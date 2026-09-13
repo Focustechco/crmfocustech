@@ -4,7 +4,7 @@ import {
   Users,
   KanbanSquare,
   Target,
-  CheckSquare,
+  CalendarCheck,
   MessageCircle,
   Mail,
   Compass,
@@ -35,7 +35,7 @@ const mainItems = [
   { title: "Leads", url: "/leads", icon: Users },
   { title: "Pipeline", url: "/pipeline", icon: KanbanSquare },
   { title: "Prospecção", url: "/deals", icon: Compass },
-  { title: "Tarefas", url: "/tasks", icon: CheckSquare },
+  { title: "Tarefas e Agenda", url: "/tasks", icon: CalendarCheck },
   { title: "Comercial OS", url: "/clients", icon: Target },
   { title: "Transcrição", url: "/transcription", icon: Sparkles },
 ];

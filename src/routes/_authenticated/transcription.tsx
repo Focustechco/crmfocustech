@@ -56,6 +56,8 @@ import {
   Award,
   BookOpen,
   Share2,
+  Trophy,
+  RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { TEAM_MEMBERS, TeamMember } from "./pipeline";
