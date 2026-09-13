@@ -42,6 +42,8 @@ import {
   User,
   Settings2,
   Palette,
+  LayoutGrid,
+  Rows3,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -374,6 +376,22 @@ export function PipelinePage() {
     return INITIAL_DEALS;
   });
 
+  // Modo de Visualização do Card (Detalhado vs Resumido/Minimizado)
+  const [cardViewMode, setCardViewMode] = useState<"detailed" | "compact">(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("focus_crm_card_view_mode");
+      if (saved === "compact" || saved === "detailed") return saved;
+    }
+    return "detailed";
+  });
+
+  const handleSetCardViewMode = (mode: "detailed" | "compact") => {
+    setCardViewMode(mode);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("focus_crm_card_view_mode", mode);
+    }
+  };
+
   // Salvar estágios localmente
   const saveStages = (updated: PipelineStage[]) => {
     setStages(updated);
@@ -479,7 +497,6 @@ export function PipelinePage() {
     saveStages(updated);
     toast.success("Coluna removida do funil");
   };
-
 
   // Buscar clientes relacionais do Supabase se existirem
   const { data: dbLeads = [] } = useQuery({
@@ -690,10 +707,42 @@ export function PipelinePage() {
           </p>
         </div>
 
-        {/* Filtros e Botão Novo Negócio */}
+        {/* Filtros, Alternador de Visualização e Botão Novo Negócio */}
         <div className="flex flex-wrap items-center gap-2.5">
+          {/* Alternador de Visualização: Detalhado vs Resumido */}
+          <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/80">
+            <button
+              type="button"
+              onClick={() => handleSetCardViewMode("detailed")}
+              className={cn(
+                "h-7 px-2.5 text-xs font-medium rounded-md flex items-center gap-1.5 transition-all cursor-pointer",
+                cardViewMode === "detailed"
+                  ? "bg-background text-foreground shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              title="Visualização Detalhada"
+            >
+              <LayoutGrid className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Detalhado</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSetCardViewMode("compact")}
+              className={cn(
+                "h-7 px-2.5 text-xs font-medium rounded-md flex items-center gap-1.5 transition-all cursor-pointer",
+                cardViewMode === "compact"
+                  ? "bg-background text-foreground shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              title="Visualização Resumida (Compacta)"
+            >
+              <Rows3 className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Resumido</span>
+            </button>
+          </div>
+
           {/* Responsável */}
-          <div className="w-[190px]">
+          <div className="w-[180px]">
             <Select value={selectedResponsible} onValueChange={setSelectedResponsible}>
               <SelectTrigger className="h-9 bg-card text-xs">
                 <Users className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
@@ -711,7 +760,7 @@ export function PipelinePage() {
           </div>
 
           {/* Fases */}
-          <div className="w-[160px]">
+          <div className="w-[150px]">
             <Select value={selectedStageFilter} onValueChange={setSelectedStageFilter}>
               <SelectTrigger className="h-9 bg-card text-xs">
                 <Filter className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
@@ -729,7 +778,7 @@ export function PipelinePage() {
           </div>
 
           {/* Período */}
-          <div className="w-[150px]">
+          <div className="w-[140px]">
             <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
               <SelectTrigger className="h-9 bg-card text-xs">
                 <CalendarDays className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
@@ -869,134 +918,218 @@ export function PipelinePage() {
               </div>
 
               {/* Lista de Cards de Negócio */}
-              <div className="flex flex-col gap-3 flex-1">
-                {stageDeals.map((deal) => (
-                  <div
-                    key={deal.id}
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, deal.id)}
-                    className={cn(
-                      "group relative bg-card text-card-foreground rounded-xl p-3.5 border border-border/80 shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing",
-                      draggingDealId === deal.id && "opacity-50 scale-95"
-                    )}
-                  >
-                    {/* Topo do Card: Código e Menu */}
-                    <div className="flex items-center justify-between mb-1.5 text-xs text-muted-foreground">
-                      <span className="font-mono font-medium">{deal.code}</span>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-5 w-5 text-muted-foreground hover:text-foreground -mr-1"
-                          >
-                            <MoreVertical className="h-3.5 w-3.5" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleOpenEditModal(deal)}>
-                            <Edit2 className="h-3.5 w-3.5 mr-2" /> Editar negócio
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleDeleteDeal(deal.id)}
-                            className="text-destructive focus:text-destructive"
-                          >
-                            <Trash2 className="h-3.5 w-3.5 mr-2" /> Excluir
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-
-                    {/* Título e Valor */}
-                    <h4
-                      onClick={() => handleOpenEditModal(deal)}
-                      className="text-xs font-bold text-foreground hover:text-[#FF6B00] cursor-pointer transition-colors leading-tight"
-                    >
-                      {deal.title}
-                    </h4>
-                    <p className="text-sm font-extrabold text-foreground mt-1">
-                      {BRL(deal.value)}
-                    </p>
-
-                    {/* Contato e Empresa */}
-                    <div className="mt-2 text-xs text-muted-foreground leading-snug">
-                      <p className="text-foreground/90 font-medium">{deal.client_name}</p>
-                      {deal.company_name && (
-                        <p className="text-muted-foreground text-[11px]">{deal.company_name}</p>
+              <div className="flex flex-col gap-2.5 flex-1">
+                {stageDeals.map((deal) =>
+                  cardViewMode === "compact" ? (
+                    /* Card Resumido / Minimizado */
+                    <div
+                      key={deal.id}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, deal.id)}
+                      className={cn(
+                        "group relative bg-card text-card-foreground rounded-xl p-2.5 border border-border/80 shadow-xs hover:shadow-md transition-all cursor-grab active:cursor-grabbing",
+                        draggingDealId === deal.id && "opacity-50 scale-95"
                       )}
-                    </div>
+                    >
+                      <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1">
+                        <span className="font-mono font-medium text-[10px]">{deal.code}</span>
+                        <div className="flex items-center gap-1">
+                          <span className="font-bold text-foreground text-xs">{BRL(deal.value)}</span>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-4 w-4 text-muted-foreground hover:text-foreground -mr-1"
+                              >
+                                <MoreVertical className="h-3 w-3" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleOpenEditModal(deal)}>
+                                <Edit2 className="h-3.5 w-3.5 mr-2" /> Editar negócio
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleDeleteDeal(deal.id)}
+                                className="text-destructive focus:text-destructive"
+                              >
+                                <Trash2 className="h-3.5 w-3.5 mr-2" /> Excluir
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </div>
 
-                    {/* Responsável */}
-                    <div className="mt-2.5">
-                      <p className="text-[10px] text-muted-foreground mb-1">Pessoas responsáveis</p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <Avatar className="h-5 w-5 ring-1 ring-border">
+                      <h4
+                        onClick={() => handleOpenEditModal(deal)}
+                        className="text-xs font-semibold text-foreground hover:text-[#FF6B00] cursor-pointer truncate transition-colors"
+                      >
+                        {deal.title}
+                      </h4>
+                      <p className="text-[11px] text-muted-foreground truncate">
+                        {deal.client_name} {deal.company_name ? `· ${deal.company_name}` : ""}
+                      </p>
+
+                      <div className="mt-2 pt-1.5 border-t border-border/40 flex items-center justify-between">
+                        <span
+                          className={cn(
+                            "px-1.5 py-0.2 rounded text-[8px] font-bold tracking-wide uppercase",
+                            deal.tag_color
+                          )}
+                        >
+                          {deal.tag}
+                        </span>
+
+                        <div className="flex items-center gap-1.5">
+                          {deal.whatsapp && (
+                            <a
+                              href={`https://wa.me/${deal.whatsapp.replace(/\D/g, "")}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-muted-foreground hover:text-emerald-500 transition-colors"
+                              title="WhatsApp"
+                            >
+                              <MessageSquare className="h-3 w-3" />
+                            </a>
+                          )}
+                          <Avatar className="h-4 w-4 ring-1 ring-border">
                             <AvatarImage src={deal.responsible.avatar} />
-                            <AvatarFallback className="text-[9px]">
+                            <AvatarFallback className="text-[7px]">
                               {deal.responsible.name.charAt(0)}
                             </AvatarFallback>
                           </Avatar>
-                          <span className="text-[11px] font-medium text-foreground truncate max-w-[130px]">
-                            {deal.responsible.name}
-                          </span>
                         </div>
-
-                        {/* Avatar secundário decorativo se houver */}
-                        <Avatar className="h-4 w-4 opacity-80 ring-1 ring-border">
-                          <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80" />
-                          <AvatarFallback className="text-[8px]">F</AvatarFallback>
-                        </Avatar>
                       </div>
                     </div>
+                  ) : (
+                    /* Card Detalhado */
+                    <div
+                      key={deal.id}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, deal.id)}
+                      className={cn(
+                        "group relative bg-card text-card-foreground rounded-xl p-3.5 border border-border/80 shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing",
+                        draggingDealId === deal.id && "opacity-50 scale-95"
+                      )}
+                    >
+                      {/* Topo do Card: Código e Menu */}
+                      <div className="flex items-center justify-between mb-1.5 text-xs text-muted-foreground">
+                        <span className="font-mono font-medium">{deal.code}</span>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-5 w-5 text-muted-foreground hover:text-foreground -mr-1"
+                            >
+                              <MoreVertical className="h-3.5 w-3.5" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleOpenEditModal(deal)}>
+                              <Edit2 className="h-3.5 w-3.5 mr-2" /> Editar negócio
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleDeleteDeal(deal.id)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="h-3.5 w-3.5 mr-2" /> Excluir
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
 
-                    {/* Tag e Ações Rápidas (Telefone / WhatsApp) */}
-                    <div className="mt-3 pt-2 border-t border-border/40 flex items-center justify-between">
-                      <span
-                        className={cn(
-                          "px-2 py-0.5 rounded text-[9px] font-bold tracking-wide uppercase",
-                          deal.tag_color
-                        )}
+                      {/* Título e Valor */}
+                      <h4
+                        onClick={() => handleOpenEditModal(deal)}
+                        className="text-xs font-bold text-foreground hover:text-[#FF6B00] cursor-pointer transition-colors leading-tight"
                       >
-                        {deal.tag}
-                      </span>
+                        {deal.title}
+                      </h4>
+                      <p className="text-sm font-extrabold text-foreground mt-1">
+                        {BRL(deal.value)}
+                      </p>
 
-                      <div className="flex items-center gap-1">
-                        {deal.phone && (
-                          <a
-                            href={`tel:${deal.phone}`}
-                            className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors"
-                            title="Ligar"
-                          >
-                            <Phone className="h-3 w-3" />
-                          </a>
-                        )}
-                        {deal.whatsapp && (
-                          <a
-                            href={`https://wa.me/${deal.whatsapp.replace(/\D/g, "")}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="p-1 text-muted-foreground hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded transition-colors"
-                            title="WhatsApp"
-                          >
-                            <MessageSquare className="h-3 w-3" />
-                          </a>
+                      {/* Contato e Empresa */}
+                      <div className="mt-2 text-xs text-muted-foreground leading-snug">
+                        <p className="text-foreground/90 font-medium">{deal.client_name}</p>
+                        {deal.company_name && (
+                          <p className="text-muted-foreground text-[11px]">{deal.company_name}</p>
                         )}
                       </div>
-                    </div>
 
-                    {/* Rodapé: Próxima Atividade */}
-                    <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
-                      <span className="flex items-center gap-1 text-muted-foreground/80">
-                        <Calendar className="h-3 w-3" />
-                        {deal.activity_title}
-                      </span>
-                      <span className="font-medium text-foreground/80">
-                        {deal.activity_date}
-                      </span>
+                      {/* Responsável */}
+                      <div className="mt-2.5">
+                        <p className="text-[10px] text-muted-foreground mb-1">Pessoas responsáveis</p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <Avatar className="h-5 w-5 ring-1 ring-border">
+                              <AvatarImage src={deal.responsible.avatar} />
+                              <AvatarFallback className="text-[9px]">
+                                {deal.responsible.name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="text-[11px] font-medium text-foreground truncate max-w-[130px]">
+                              {deal.responsible.name}
+                            </span>
+                          </div>
+
+                          {/* Avatar secundário decorativo se houver */}
+                          <Avatar className="h-4 w-4 opacity-80 ring-1 ring-border">
+                            <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80" />
+                            <AvatarFallback className="text-[8px]">F</AvatarFallback>
+                          </Avatar>
+                        </div>
+                      </div>
+
+                      {/* Tag e Ações Rápidas (Telefone / WhatsApp) */}
+                      <div className="mt-3 pt-2 border-t border-border/40 flex items-center justify-between">
+                        <span
+                          className={cn(
+                            "px-2 py-0.5 rounded text-[9px] font-bold tracking-wide uppercase",
+                            deal.tag_color
+                          )}
+                        >
+                          {deal.tag}
+                        </span>
+
+                        <div className="flex items-center gap-1">
+                          {deal.phone && (
+                            <a
+                              href={`tel:${deal.phone}`}
+                              className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors"
+                              title="Ligar"
+                            >
+                              <Phone className="h-3 w-3" />
+                            </a>
+                          )}
+                          {deal.whatsapp && (
+                            <a
+                              href={`https://wa.me/${deal.whatsapp.replace(/\D/g, "")}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="p-1 text-muted-foreground hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded transition-colors"
+                              title="WhatsApp"
+                            >
+                              <MessageSquare className="h-3 w-3" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Rodapé: Próxima Atividade */}
+                      <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
+                        <span className="flex items-center gap-1 text-muted-foreground/80">
+                          <Calendar className="h-3 w-3" />
+                          {deal.activity_title}
+                        </span>
+                        <span className="font-medium text-foreground/80">
+                          {deal.activity_date}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                )}
 
                 {/* Card Inline "Adicionar Negócio" */}
                 <button
