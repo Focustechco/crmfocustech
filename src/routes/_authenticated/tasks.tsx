@@ -67,6 +67,8 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   Copy,
   Zap,
   RotateCcw,
@@ -487,6 +489,127 @@ export function TasksAndAgendaPage() {
   const [taskSearch, setTaskSearch] = useState<string>("");
 
   const [goalUserFilter, setGoalUserFilter] = useState<string>("all");
+
+  // Filtros e Estado do Calendário
+  const [calendarDate, setCalendarDate] = useState<Date>(new Date());
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState<string>(
+    new Date().toISOString().split("T")[0]
+  );
+  const [calendarHostFilter, setCalendarHostFilter] = useState<string>("all");
+  const [calendarTypeFilter, setCalendarTypeFilter] = useState<"all" | "meetings" | "tasks">("all");
+
+  // Navegação do Calendário
+  const handlePrevMonth = () => {
+    setCalendarDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCalendarDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  };
+
+  const handleTodayCalendar = () => {
+    const now = new Date();
+    setCalendarDate(now);
+    setSelectedCalendarDate(now.toISOString().split("T")[0]);
+  };
+
+  // Grid do Calendário
+  const calendarGrid = useMemo(() => {
+    const year = calendarDate.getFullYear();
+    const month = calendarDate.getMonth();
+
+    const firstDayOfWeek = new Date(year, month, 1).getDay(); // 0 (Dom) a 6 (Sáb)
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+    const days: {
+      day: number;
+      month: number;
+      year: number;
+      dateKey: string;
+      isCurrentMonth: boolean;
+    }[] = [];
+
+    // Dias do mês anterior
+    for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+      const d = daysInPrevMonth - i;
+      const m = month === 0 ? 11 : month - 1;
+      const y = month === 0 ? year - 1 : year;
+      const dateKey = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      days.push({ day: d, month: m, year: y, dateKey, isCurrentMonth: false });
+    }
+
+    // Dias do mês atual
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateKey = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      days.push({ day: d, month, year, dateKey, isCurrentMonth: true });
+    }
+
+    // Dias do próximo mês para completar grade
+    const totalCount = days.length;
+    const requiredTotal = totalCount <= 35 ? 35 : 42;
+    const trailingCount = requiredTotal - totalCount;
+    for (let d = 1; d <= trailingCount; d++) {
+      const m = month === 11 ? 0 : month + 1;
+      const y = month === 11 ? year + 1 : year;
+      const dateKey = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      days.push({ day: d, month: m, year: y, dateKey, isCurrentMonth: false });
+    }
+
+    return days;
+  }, [calendarDate]);
+
+  // Mapa de eventos do calendário por data
+  const calendarEventsMap = useMemo(() => {
+    const map: Record<
+      string,
+      {
+        meetings: MeetingItem[];
+        tasks: TaskItem[];
+      }
+    > = {};
+
+    meetings.forEach((m) => {
+      const dateKey = m.scheduledStart.split("T")[0];
+      const matchHost = calendarHostFilter === "all" || m.hostId === calendarHostFilter;
+      const matchType = calendarTypeFilter === "all" || calendarTypeFilter === "meetings";
+      if (matchHost && matchType) {
+        if (!map[dateKey]) map[dateKey] = { meetings: [], tasks: [] };
+        map[dateKey].meetings.push(m);
+      }
+    });
+
+    tasks.forEach((t) => {
+      if (t.dueAt) {
+        const dateKey = t.dueAt;
+        const matchAssignee = calendarHostFilter === "all" || t.assignedToId === calendarHostFilter;
+        const matchType = calendarTypeFilter === "all" || calendarTypeFilter === "tasks";
+        if (matchAssignee && matchType) {
+          if (!map[dateKey]) map[dateKey] = { meetings: [], tasks: [] };
+          map[dateKey].tasks.push(t);
+        }
+      }
+    });
+
+    return map;
+  }, [meetings, tasks, calendarHostFilter, calendarTypeFilter]);
+
+  // Eventos do dia selecionado
+  const selectedDayEvents = useMemo(() => {
+    const mList = meetings.filter((m) => {
+      const dateKey = m.scheduledStart.split("T")[0];
+      const matchHost = calendarHostFilter === "all" || m.hostId === calendarHostFilter;
+      return dateKey === selectedCalendarDate && matchHost;
+    });
+
+    const tList = tasks.filter((t) => {
+      const dateKey = t.dueAt;
+      const matchAssignee = calendarHostFilter === "all" || t.assignedToId === calendarHostFilter;
+      return dateKey === selectedCalendarDate && matchAssignee;
+    });
+
+    return { meetings: mList, tasks: tList };
+  }, [meetings, tasks, selectedCalendarDate, calendarHostFilter]);
 
   // Modais
   const [openMeetingModal, setOpenMeetingModal] = useState(false);
@@ -1011,25 +1134,32 @@ export function TasksAndAgendaPage() {
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-3">
-          <TabsList className="bg-muted/60 p-1 border">
-            <TabsTrigger value="agenda" className="gap-2 data-[state=active]:bg-background">
-              <CalendarDays className="h-4 w-4 text-[#FF6B00]" />
+          <TabsList className="bg-muted/60 p-1 border overflow-x-auto max-w-full justify-start sm:justify-center flex-nowrap shrink-0">
+            <TabsTrigger value="agenda" className="gap-1.5 sm:gap-2 data-[state=active]:bg-background text-xs shrink-0 cursor-pointer">
+              <CalendarDays className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#FF6B00]" />
               <span>Agenda & Reuniões</span>
-              <Badge variant="secondary" className="ml-1 text-xs px-1.5 py-0">
+              <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0">
                 {meetings.length}
               </Badge>
             </TabsTrigger>
-            <TabsTrigger value="checklist" className="gap-2 data-[state=active]:bg-background">
-              <CheckSquare className="h-4 w-4 text-blue-500" />
-              <span>Checklist de Tarefas</span>
-              <Badge variant="secondary" className="ml-1 text-xs px-1.5 py-0">
+            <TabsTrigger value="calendar" className="gap-1.5 sm:gap-2 data-[state=active]:bg-background text-xs shrink-0 cursor-pointer">
+              <CalendarIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-500" />
+              <span>Calendário</span>
+              <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0">
+                {meetings.length + tasks.filter((t) => t.status !== "done").length}
+              </Badge>
+            </TabsTrigger>
+            <TabsTrigger value="checklist" className="gap-1.5 sm:gap-2 data-[state=active]:bg-background text-xs shrink-0 cursor-pointer">
+              <CheckSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-500" />
+              <span>Checklist</span>
+              <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0">
                 {tasks.filter((t) => t.status !== "done").length}
               </Badge>
             </TabsTrigger>
-            <TabsTrigger value="goals" className="gap-2 data-[state=active]:bg-background">
-              <Target className="h-4 w-4 text-emerald-500" />
+            <TabsTrigger value="goals" className="gap-1.5 sm:gap-2 data-[state=active]:bg-background text-xs shrink-0 cursor-pointer">
+              <Target className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500" />
               <span>Metas & OKRs</span>
-              <Badge variant="secondary" className="ml-1 text-xs px-1.5 py-0">
+              <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0">
                 {goals.length}
               </Badge>
             </TabsTrigger>
@@ -1270,6 +1400,457 @@ export function TasksAndAgendaPage() {
               })}
             </div>
           )}
+        </TabsContent>
+
+        {/* ABA: CALENDÁRIO */}
+        <TabsContent value="calendar" className="space-y-4">
+          <div className="flex flex-col gap-2 bg-muted/30 p-2.5 sm:p-3 rounded-lg border">
+            {/* Linha 1: Navegação de Mês + Seletor de Tipo */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handlePrevMonth}
+                  className="h-8 w-8 bg-background cursor-pointer"
+                  title="Mês anterior"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+
+                <span className="font-semibold text-xs sm:text-sm capitalize min-w-[130px] sm:min-w-[160px] text-center">
+                  {calendarDate.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}
+                </span>
+
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleNextMonth}
+                  className="h-8 w-8 bg-background cursor-pointer"
+                  title="Próximo mês"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleTodayCalendar}
+                  className="h-8 text-xs px-2 sm:px-2.5 font-medium text-[#FF6B00] hover:text-[#E65C00] cursor-pointer"
+                >
+                  Hoje
+                </Button>
+              </div>
+
+              {/* Seletor de Tipo (Todas / Reuniões / Tarefas) */}
+              <div className="flex items-center bg-background rounded-md border p-0.5 shrink-0">
+                <Button
+                  size="sm"
+                  variant={calendarTypeFilter === "all" ? "default" : "ghost"}
+                  onClick={() => setCalendarTypeFilter("all")}
+                  className={calendarTypeFilter === "all" ? "bg-[#FF6B00] text-white h-7 text-xs px-2 cursor-pointer" : "h-7 text-xs px-2 cursor-pointer"}
+                >
+                  Todos
+                </Button>
+                <Button
+                  size="sm"
+                  variant={calendarTypeFilter === "meetings" ? "default" : "ghost"}
+                  onClick={() => setCalendarTypeFilter("meetings")}
+                  className={calendarTypeFilter === "meetings" ? "bg-[#FF6B00] text-white h-7 text-xs px-2 cursor-pointer" : "h-7 text-xs px-2 cursor-pointer"}
+                >
+                  Reuniões
+                </Button>
+                <Button
+                  size="sm"
+                  variant={calendarTypeFilter === "tasks" ? "default" : "ghost"}
+                  onClick={() => setCalendarTypeFilter("tasks")}
+                  className={calendarTypeFilter === "tasks" ? "bg-[#FF6B00] text-white h-7 text-xs px-2 cursor-pointer" : "h-7 text-xs px-2 cursor-pointer"}
+                >
+                  Tarefas
+                </Button>
+              </div>
+            </div>
+
+            {/* Linha 2: Responsável + Ações Rápidas */}
+            <div className="flex items-center justify-between gap-2">
+              <Select value={calendarHostFilter} onValueChange={setCalendarHostFilter}>
+                <SelectTrigger className="w-full sm:w-[220px] h-8 text-xs bg-background">
+                  <SelectValue placeholder="Responsável" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Toda a Equipe</SelectItem>
+                  {TEAM_MEMBERS.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>
+                      {m.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <div className="flex items-center gap-1.5 shrink-0">
+                <Button
+                  onClick={() => {
+                    setNewMeetingForm((prev) => ({ ...prev, date: selectedCalendarDate }));
+                    setOpenMeetingModal(true);
+                  }}
+                  size="sm"
+                  className="bg-[#FF6B00] hover:bg-[#E65C00] text-white h-8 text-xs px-2.5 font-medium cursor-pointer"
+                >
+                  <Video className="h-3.5 w-3.5 mr-1" />
+                  <span>+ Reunião</span>
+                </Button>
+                <Button
+                  onClick={() => {
+                    setNewTaskForm((prev) => ({ ...prev, dueAt: selectedCalendarDate }));
+                    setOpenTaskModal(true);
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="border-border bg-background hover:bg-muted h-8 text-xs px-2.5 font-medium cursor-pointer"
+                >
+                  <CheckSquare className="h-3.5 w-3.5 mr-1 text-blue-500" />
+                  <span>+ Tarefa</span>
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Card da Grade do Calendário */}
+          <Card className="p-3 sm:p-4 bg-card border shadow-xs">
+            {/* Cabeçalho dos Dias da Semana */}
+            <div className="grid grid-cols-7 gap-1 sm:gap-2 text-center mb-2 pb-2 border-b">
+              {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((weekday, idx) => (
+                <div
+                  key={weekday}
+                  className={`text-[11px] sm:text-xs font-semibold uppercase tracking-wider ${
+                    idx === 0 || idx === 6 ? "text-muted-foreground" : "text-foreground"
+                  }`}
+                >
+                  <span className="sm:hidden">{weekday[0]}</span>
+                  <span className="hidden sm:inline">{weekday}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Células dos Dias */}
+            <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
+              {calendarGrid.map((cell) => {
+                const isToday = cell.dateKey === new Date().toISOString().split("T")[0];
+                const isSelected = cell.dateKey === selectedCalendarDate;
+                const events = calendarEventsMap[cell.dateKey] || { meetings: [], tasks: [] };
+                const totalMeetings = events.meetings.length;
+                const totalTasks = events.tasks.length;
+                const hasEvents = totalMeetings > 0 || totalTasks > 0;
+
+                return (
+                  <button
+                    key={cell.dateKey}
+                    type="button"
+                    onClick={() => setSelectedCalendarDate(cell.dateKey)}
+                    className={`min-h-[55px] sm:min-h-[85px] p-1 sm:p-1.5 rounded-lg border text-left flex flex-col justify-between transition-all cursor-pointer relative group ${
+                      !cell.isCurrentMonth
+                        ? "opacity-35 bg-muted/10 border-transparent"
+                        : isSelected
+                        ? "bg-[#FF6B00]/10 border-[#FF6B00] ring-1 ring-[#FF6B00]"
+                        : isToday
+                        ? "bg-primary/5 border-primary/40 font-medium"
+                        : "bg-background hover:bg-muted/40 border-border/60"
+                    }`}
+                  >
+                    {/* Header do dia na célula */}
+                    <div className="flex items-center justify-between w-full">
+                      <span
+                        className={`text-[11px] sm:text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium ${
+                          isToday
+                            ? "bg-[#FF6B00] text-white font-bold"
+                            : isSelected
+                            ? "text-[#FF6B00] font-bold"
+                            : cell.isCurrentMonth
+                            ? "text-foreground"
+                            : "text-muted-foreground"
+                        }`}
+                      >
+                        {cell.day}
+                      </span>
+
+                      {/* Contador Compacto no Topo Direito */}
+                      {hasEvents && (
+                        <div className="hidden sm:flex items-center gap-1">
+                          {totalMeetings > 0 && (
+                            <span className="h-1.5 w-1.5 rounded-full bg-[#FF6B00]" />
+                          )}
+                          {totalTasks > 0 && (
+                            <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Versão Desktop: Badges de Reuniões e Tarefas */}
+                    <div className="hidden sm:flex flex-col gap-1 mt-1 w-full overflow-hidden">
+                      {events.meetings.slice(0, 2).map((m) => (
+                        <div
+                          key={m.id}
+                          className="text-[10px] leading-tight px-1.5 py-0.5 rounded bg-[#FF6B00]/15 text-[#FF6B00] font-medium truncate flex items-center gap-1"
+                          title={`${new Date(m.scheduledStart).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })} - ${m.title}`}
+                        >
+                          <Video className="h-2.5 w-2.5 shrink-0" />
+                          <span className="truncate">
+                            {new Date(m.scheduledStart).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })} {m.title}
+                          </span>
+                        </div>
+                      ))}
+
+                      {events.tasks.slice(0, events.meetings.length > 0 ? 1 : 2).map((t) => (
+                        <div
+                          key={t.id}
+                          className={`text-[10px] leading-tight px-1.5 py-0.5 rounded font-medium truncate flex items-center gap-1 ${
+                            t.status === "done"
+                              ? "bg-emerald-500/10 text-emerald-600 line-through"
+                              : t.priority === "urgent"
+                              ? "bg-red-500/10 text-red-600"
+                              : "bg-blue-500/10 text-blue-600"
+                          }`}
+                          title={t.title}
+                        >
+                          <CheckSquare className="h-2.5 w-2.5 shrink-0" />
+                          <span className="truncate">{t.title}</span>
+                        </div>
+                      ))}
+
+                      {totalMeetings + totalTasks > 2 && (
+                        <span className="text-[9px] text-muted-foreground font-semibold pl-0.5">
+                          +{totalMeetings + totalTasks - 2} mais
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Versão Mobile: Indicadores de Pontos Coloridos */}
+                    <div className="sm:hidden flex items-center justify-center gap-1 mt-auto pt-1">
+                      {totalMeetings > 0 && (
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#FF6B00]" />
+                      )}
+                      {totalTasks > 0 && (
+                        <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </Card>
+
+          {/* Detalhes do Dia Selecionado */}
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 bg-card rounded-lg border">
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-lg bg-[#FF6B00]/10 flex items-center justify-center text-[#FF6B00] shrink-0">
+                  <CalendarIcon className="h-4 w-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-foreground">
+                    Compromissos de{" "}
+                    {new Date(selectedCalendarDate + "T12:00:00").toLocaleDateString("pt-BR", {
+                      weekday: "long",
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    {selectedDayEvents.meetings.length} reunião(ões) agendada(s) ·{" "}
+                    {selectedDayEvents.tasks.length} tarefa(s) vinculada(s)
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => {
+                    setNewMeetingForm((prev) => ({ ...prev, date: selectedCalendarDate }));
+                    setOpenMeetingModal(true);
+                  }}
+                  size="sm"
+                  className="bg-[#FF6B00] hover:bg-[#E65C00] text-white h-8 text-xs shadow-xs cursor-pointer"
+                >
+                  <Video className="h-3.5 w-3.5 mr-1" /> + Reunião
+                </Button>
+                <Button
+                  onClick={() => {
+                    setNewTaskForm((prev) => ({ ...prev, dueAt: selectedCalendarDate }));
+                    setOpenTaskModal(true);
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs cursor-pointer"
+                >
+                  <CheckSquare className="h-3.5 w-3.5 mr-1 text-blue-500" /> + Tarefa
+                </Button>
+              </div>
+            </div>
+
+            {selectedDayEvents.meetings.length === 0 && selectedDayEvents.tasks.length === 0 ? (
+              <Card className="p-8 text-center border-dashed bg-muted/10">
+                <CalendarIcon className="h-8 w-8 text-muted-foreground mx-auto mb-2 opacity-50" />
+                <p className="text-xs text-muted-foreground">
+                  Nenhum compromisso ou entrega agendada para esta data.
+                </p>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Coluna 1: Reuniões */}
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between px-1">
+                    <span className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                      <Video className="h-3.5 w-3.5 text-[#FF6B00]" />
+                      Reuniões ({selectedDayEvents.meetings.length})
+                    </span>
+                  </div>
+
+                  {selectedDayEvents.meetings.length === 0 ? (
+                    <div className="p-4 rounded-lg border border-dashed text-xs text-muted-foreground text-center bg-card">
+                      Nenhuma reunião agendada para este dia.
+                    </div>
+                  ) : (
+                    selectedDayEvents.meetings.map((meeting) => {
+                      const typeCfg = MEETING_TYPES_CONFIG[meeting.meetingType] || MEETING_TYPES_CONFIG.diagnostico;
+                      const TypeIcon = typeCfg.icon;
+                      const host = TEAM_MEMBERS.find((m) => m.id === meeting.hostId) || TEAM_MEMBERS[0];
+                      const startDate = new Date(meeting.scheduledStart);
+                      const timeStr = startDate.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+
+                      return (
+                        <Card key={meeting.id} className="p-3.5 space-y-3 bg-card border shadow-xs">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="space-y-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${typeCfg.badge}`}>
+                                  <TypeIcon className="h-3 w-3 mr-1" />
+                                  {typeCfg.label}
+                                </Badge>
+                                <span className="text-xs font-semibold text-foreground flex items-center gap-1">
+                                  <Clock className="h-3 w-3 text-muted-foreground" /> {timeStr} ({meeting.durationMinutes} min)
+                                </span>
+                              </div>
+                              <h4 className="font-bold text-sm text-foreground truncate">{meeting.title}</h4>
+                              {(meeting.leadName || meeting.companyName) && (
+                                <p className="text-xs text-muted-foreground">
+                                  {meeting.leadName} {meeting.companyName && `· ${meeting.companyName}`}
+                                </p>
+                              )}
+                            </div>
+
+                            <Avatar className="h-7 w-7 border shrink-0">
+                              <AvatarImage src={host.avatar} />
+                              <AvatarFallback>{host.name[0]}</AvatarFallback>
+                            </Avatar>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-1 border-t gap-2">
+                            <a
+                              href={meeting.meetLink}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center justify-center rounded-md text-xs font-medium bg-[#FF6B00] hover:bg-[#E65C00] text-white h-7 px-2.5 shadow-xs transition-colors"
+                            >
+                              <Video className="h-3 w-3 mr-1" /> Entrar no Meet
+                            </a>
+
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                navigator.clipboard.writeText(
+                                  `Olá! Segue o link da nossa reunião: ${meeting.title}\nHorário: ${timeStr}\nLink Google Meet: ${meeting.meetLink}`
+                                );
+                                toast.success("Convite copiado para o WhatsApp!");
+                              }}
+                              className="h-7 text-xs text-muted-foreground hover:text-foreground"
+                            >
+                              <Copy className="h-3 w-3 mr-1" /> Copiar Link
+                            </Button>
+                          </div>
+                        </Card>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Coluna 2: Tarefas */}
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between px-1">
+                    <span className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                      <CheckSquare className="h-3.5 w-3.5 text-blue-500" />
+                      Tarefas & Entregas ({selectedDayEvents.tasks.length})
+                    </span>
+                  </div>
+
+                  {selectedDayEvents.tasks.length === 0 ? (
+                    <div className="p-4 rounded-lg border border-dashed text-xs text-muted-foreground text-center bg-card">
+                      Nenhuma tarefa com prazo para este dia.
+                    </div>
+                  ) : (
+                    selectedDayEvents.tasks.map((task) => {
+                      const assignee = TEAM_MEMBERS.find((m) => m.id === task.assignedToId) || TEAM_MEMBERS[0];
+                      const priorityCfg = PRIORITY_CONFIG[task.priority] || PRIORITY_CONFIG.medium;
+                      const categoryCfg = CATEGORY_CONFIG[task.category] || CATEGORY_CONFIG.comercial;
+                      const isDone = task.status === "done";
+
+                      return (
+                        <Card
+                          key={task.id}
+                          className={`p-3.5 bg-card border shadow-xs transition-all ${
+                            isDone ? "opacity-70 bg-muted/30" : ""
+                          }`}
+                        >
+                          <div className="flex items-start gap-2.5">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleTaskStatus(task.id)}
+                              className={`h-4.5 w-4.5 rounded border flex items-center justify-center mt-0.5 shrink-0 transition-colors ${
+                                isDone
+                                  ? "bg-emerald-600 border-emerald-600 text-white"
+                                  : "border-muted-foreground/40 hover:border-[#FF6B00]"
+                              }`}
+                            >
+                              {isDone && <Check className="h-3 w-3 stroke-[3]" />}
+                            </button>
+
+                            <div className="space-y-1.5 flex-1 min-w-0">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span
+                                  className={`text-xs font-semibold ${
+                                    isDone ? "line-through text-muted-foreground" : "text-foreground"
+                                  }`}
+                                >
+                                  {task.title}
+                                </span>
+                                <Badge variant="outline" className={`text-[9px] px-1 py-0 ${categoryCfg.badge}`}>
+                                  {categoryCfg.label}
+                                </Badge>
+                                <Badge variant="outline" className={`text-[9px] px-1 py-0 ${priorityCfg.badge}`}>
+                                  {priorityCfg.label}
+                                </Badge>
+                              </div>
+
+                              <div className="flex items-center justify-between text-[11px] text-muted-foreground pt-1">
+                                <span>{assignee.name}</span>
+                                {task.checklist.length > 0 && (
+                                  <span>
+                                    {task.checklist.filter((s) => s.done).length}/{task.checklist.length} subitens
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </TabsContent>
 
         {/* ABA 2: CHECKLIST */}
@@ -1679,7 +2260,7 @@ export function TasksAndAgendaPage() {
 
       {/* MODAL REUNIÃO */}
       <Dialog open={openMeetingModal} onOpenChange={setOpenMeetingModal}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Video className="h-5 w-5 text-[#FF6B00]" />
@@ -1827,7 +2408,7 @@ export function TasksAndAgendaPage() {
 
       {/* MODAL TAREFA */}
       <Dialog open={openTaskModal} onOpenChange={setOpenTaskModal}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <CheckSquare className="h-5 w-5 text-blue-500" />
@@ -1955,7 +2536,7 @@ export function TasksAndAgendaPage() {
 
       {/* MODAL META */}
       <Dialog open={openGoalModal} onOpenChange={setOpenGoalModal}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Target className="h-5 w-5 text-emerald-600" />
