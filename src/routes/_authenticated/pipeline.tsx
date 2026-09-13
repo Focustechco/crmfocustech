@@ -695,7 +695,7 @@ export function PipelinePage() {
   };
 
   return (
-    <div className="flex flex-col gap-5 min-h-[calc(100vh-5rem)]">
+    <div className="flex flex-col gap-3.5 min-h-[calc(100vh-5rem)]">
       {/* 1. Header com Título e Filtros */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
@@ -804,34 +804,66 @@ export function PipelinePage() {
         </div>
       </div>
 
-      {/* 2. Régua Horizontal das Etapas (Chevron Funnel Ribbon) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 w-full overflow-x-auto pb-1">
-        {stages.map((stage) => {
+      {/* 2. Barra de Seção / Funil Minimalista e Compacta */}
+      <div className="flex items-center gap-1 overflow-x-auto p-1 bg-card/70 backdrop-blur-xs border border-border/70 rounded-xl shadow-2xs scrollbar-none">
+        {stages.map((stage, idx) => {
           const stat = stageStats.get(stage.id) || { count: 0, totalValue: 0 };
           const isActive = activeRibbonStage === stage.id;
 
           return (
-            <div
-              key={stage.id}
-              onClick={() => setActiveRibbonStage(stage.id)}
-              className={cn(
-                "relative flex items-center justify-between px-3.5 py-2.5 rounded-xl cursor-pointer transition-all border",
-                isActive
-                  ? "bg-[#FF6B00] text-white border-[#FF6B00] shadow-sm ring-2 ring-[#FF6B00]/20"
-                  : "bg-card text-card-foreground border-border/70 hover:border-[#FF6B00]/40 hover:bg-muted/40"
-              )}
-            >
-              <div className="min-w-0 pr-2">
-                <p className={cn("text-xs font-semibold truncate", isActive ? "text-white" : "text-foreground")}>
-                  {stage.name} <span className={cn("text-[11px] font-normal", isActive ? "text-white/90" : "text-muted-foreground")}>({stat.count})</span>
-                </p>
-                <p className={cn("text-xs font-bold mt-0.5", isActive ? "text-white" : "text-[#FF6B00]")}>
+            <div key={stage.id} className="flex items-center shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  if (activeRibbonStage === stage.id) {
+                    setActiveRibbonStage(null);
+                    setSelectedStageFilter("all");
+                  } else {
+                    setActiveRibbonStage(stage.id);
+                    setSelectedStageFilter(stage.id);
+                  }
+                }}
+                className={cn(
+                  "flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-all cursor-pointer border select-none",
+                  isActive
+                    ? "bg-[#FF6B00]/10 border-[#FF6B00]/30 text-foreground font-semibold shadow-2xs ring-1 ring-[#FF6B00]/20"
+                    : "border-transparent bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                )}
+                title={`${stage.name} - ${stat.count} negócios (${BRL(stat.totalValue)})`}
+              >
+                {/* Dot com a cor da etapa */}
+                <span
+                  className="h-2 w-2 rounded-full shrink-0 ring-1 ring-border/40"
+                  style={{ backgroundColor: stage.color }}
+                />
+
+                {/* Nome da Etapa */}
+                <span className={cn("font-medium truncate max-w-[130px]", isActive ? "text-foreground font-semibold" : "text-foreground/90")}>
+                  {stage.name}
+                </span>
+
+                {/* Contador */}
+                <span
+                  className={cn(
+                    "text-[10px] px-1.5 py-0.5 rounded-full font-medium leading-none",
+                    isActive
+                      ? "bg-[#FF6B00]/20 text-[#FF6B00]"
+                      : "bg-muted text-muted-foreground"
+                  )}
+                >
+                  {stat.count}
+                </span>
+
+                {/* Valor Total da Etapa */}
+                <span className={cn("text-[11px] font-semibold tracking-tight", isActive ? "text-[#FF6B00]" : "text-foreground/80")}>
                   {BRL(stat.totalValue)}
-                </p>
-              </div>
-              <ChevronRight
-                className={cn("h-4 w-4 shrink-0 transition-transform", isActive ? "text-white translate-x-0.5" : "text-muted-foreground/60")}
-              />
+                </span>
+              </button>
+
+              {/* Conector sutil entre etapas */}
+              {idx < stages.length - 1 && (
+                <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/30 shrink-0 mx-0.5" />
+              )}
             </div>
           );
         })}
