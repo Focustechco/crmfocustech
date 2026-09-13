@@ -63,6 +63,7 @@ import {
 import { useTheme } from "@/lib/theme";
 import { toast } from "sonner";
 import { TEAM_MEMBERS, TeamMember } from "./pipeline";
+import { useKpiCards } from "@/hooks/use-kpi-cards";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Configurações · Focus CRM" }] }),
@@ -123,6 +124,7 @@ const INITIAL_TEAM: TeamMemberExtended[] = [
 
 export function SettingsPage() {
   const { theme, setTheme } = useTheme();
+  const { collapsed: kpiCollapsed, setCollapsed: setKpiCollapsed } = useKpiCards();
   const [activeTab, setActiveTab] = useState("profile");
 
   // Estados Perfil
@@ -881,6 +883,56 @@ export function SettingsPage() {
                 <Save className="h-4 w-4 mr-1.5" /> Salvar Configurações
               </Button>
             </CardFooter>
+          </Card>
+
+          {/* Interface & Display Preferences */}
+          <Card className="border bg-card shadow-xs">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Sun className="h-4 w-4 text-amber-500" /> Interface &amp; Preferências de Exibição
+              </CardTitle>
+              <CardDescription>
+                Personalize como o CRM exibe informações nos módulos em diferentes dispositivos.
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-1 divide-y divide-border/60">
+              {/* KPI Cards Toggle */}
+              <div className="flex items-center justify-between py-4">
+                <div className="space-y-0.5">
+                  <p className="text-sm font-semibold text-foreground">
+                    Ocultar cards de métricas no mobile
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Minimiza os 4 indicadores do topo dos módulos em dispositivos móveis para ganhar mais espaço de tela.
+                  </p>
+                </div>
+                <Switch
+                  checked={kpiCollapsed}
+                  onCheckedChange={(v) => {
+                    setKpiCollapsed(v);
+                    toast.success(v ? "Cards de métricas ocultados no mobile." : "Cards de métricas visíveis no mobile.");
+                  }}
+                />
+              </div>
+
+              {/* Theme */}
+              <div className="flex items-center justify-between py-4">
+                <div className="space-y-0.5">
+                  <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+                    {theme === "dark" ? <Moon className="h-4 w-4 text-indigo-400" /> : <Sun className="h-4 w-4 text-amber-500" />}
+                    Tema da Interface
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Alterne entre o modo claro e escuro do painel.
+                  </p>
+                </div>
+                <Switch
+                  checked={theme === "dark"}
+                  onCheckedChange={(v) => setTheme(v ? "dark" : "light")}
+                />
+              </div>
+            </CardContent>
           </Card>
         </TabsContent>
       </Tabs>

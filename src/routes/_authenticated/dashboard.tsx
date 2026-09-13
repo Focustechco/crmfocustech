@@ -16,6 +16,8 @@ import {
   Award,
   ChevronRight,
   Zap,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import {
   AreaChart,
@@ -38,6 +40,7 @@ import {
   PipelineStage,
   DealItem,
 } from "./pipeline";
+import { useKpiCards } from "@/hooks/use-kpi-cards";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard · Focus CRM" }] }),
@@ -96,6 +99,7 @@ function FunnelBarTooltip({ active, payload }: any) {
 }
 
 export function DashboardPage() {
+  const { collapsed: kpiCollapsed, toggle: toggleKpi } = useKpiCards();
   // 1. Carregar estágios e negócios sincronizados com o Pipeline CRM
   const [stages, setStages] = useState<PipelineStage[]>(() => {
     if (typeof window !== "undefined") {
@@ -299,7 +303,17 @@ export function DashboardPage() {
       </div>
 
       {/* 1. KPIs Principais */}
-      <div className="grid grid-cols-2 gap-3.5 md:grid-cols-4">
+      {/* KPI Cards toggle — mobile only */}
+      <div className="md:hidden flex items-center justify-between">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Indicadores</span>
+        <button
+          onClick={toggleKpi}
+          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors py-0.5 px-2 rounded-md hover:bg-muted"
+        >
+          {kpiCollapsed ? <><ChevronDown className="h-3.5 w-3.5" /> Mostrar</> : <><ChevronUp className="h-3.5 w-3.5" /> Ocultar</>}
+        </button>
+      </div>
+      <div className={kpiCollapsed ? "hidden md:grid grid-cols-2 gap-3.5 md:grid-cols-4" : "grid grid-cols-2 gap-3.5 md:grid-cols-4"}>
         {kpis.map((k) => (
           <Card key={k.label} className="shadow-xs border-border/80 hover:shadow-md transition-shadow">
             <CardContent className="p-4 md:p-5">

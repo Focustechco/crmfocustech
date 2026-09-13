@@ -54,6 +54,8 @@ import {
   Target,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Maximize2,
   Download,
   Share2,
@@ -65,6 +67,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { TEAM_MEMBERS, TeamMember } from "./pipeline";
+import { useKpiCards } from "@/hooks/use-kpi-cards";
 
 export const Route = createFileRoute("/_authenticated/deals")({
   head: () => ({ meta: [{ title: "Prospecção · Focus CRM" }] }),
@@ -304,6 +307,7 @@ const PITCH_DECK_SLIDES = [
 
 function ProspeccaoPage() {
   const [activeTab, setActiveTab] = useState<"sdr" | "scripts" | "presentation" | "vault">("sdr");
+  const { collapsed: kpiCollapsed, toggle: toggleKpi } = useKpiCards();
 
   // Estados dos Scripts
   const [scripts, setScripts] = useState<SalesScript[]>(() => {
@@ -517,8 +521,17 @@ function ProspeccaoPage() {
         </div>
       </div>
 
-      {/* Mini-Cockpit / KPIs de Prospecção */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+      {/* Mini-Cockpit / KPIs de Prospecção — toggle mobile */}
+      <div className="md:hidden flex items-center justify-between">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Indicadores</span>
+        <button
+          onClick={toggleKpi}
+          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors py-0.5 px-2 rounded-md hover:bg-muted"
+        >
+          {kpiCollapsed ? <><ChevronDown className="h-3.5 w-3.5" /> Mostrar</> : <><ChevronUp className="h-3.5 w-3.5" /> Ocultar</>}
+        </button>
+      </div>
+      <div className={kpiCollapsed ? "hidden md:grid grid-cols-2 md:grid-cols-4 gap-3.5" : "grid grid-cols-2 md:grid-cols-4 gap-3.5"}>
         <Card className="p-4 bg-card border-border/80 shadow-xs relative overflow-hidden group hover:border-primary/40 transition-colors">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -576,7 +589,7 @@ function ProspeccaoPage() {
         <Card className="p-4 bg-card border-border/80 shadow-xs relative overflow-hidden group hover:border-primary/40 transition-colors">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Materiais & Scripts
+              Materiais &amp; Scripts
             </span>
             <div className="p-1.5 rounded-lg bg-purple-500/10 text-purple-500">
               <BookOpen className="h-4 w-4" />
@@ -655,7 +668,7 @@ function ProspeccaoPage() {
       {activeTab === "sdr" && (
         <div className="space-y-6">
           {/* Mini-Barra de Produtividade Rápida do SDR */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3.5">
             <Card className="p-4 bg-muted/20 border flex items-center justify-between">
               <div>
                 <p className="text-xs text-muted-foreground font-medium">Ligações SDR Hoje</p>
@@ -717,7 +730,7 @@ function ProspeccaoPage() {
             {/* Lado Esquerdo: Simulador e Qualificador BANT */}
             <div className="lg:col-span-7 space-y-4">
               <Card className="p-5 border-border/80 shadow-xs space-y-4">
-                <div className="flex items-center justify-between border-b pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-3 gap-2">
                   <div>
                     <h3 className="font-bold text-base text-foreground flex items-center gap-2">
                       <Target className="h-4 w-4 text-primary" />
@@ -758,11 +771,11 @@ function ProspeccaoPage() {
 
                   {/* B - Budget */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                    <label className="text-xs font-semibold text-foreground flex items-center justify-between flex-wrap gap-1">
                       <span>💰 [B] Budget (Orçamento)</span>
                       <span className="text-[10px] text-muted-foreground">Tem verba para investir?</span>
                     </label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 sm:gap-2">
                       {[
                         { id: "yes", label: "Verba Confirmada" },
                         { id: "review", label: "Em Avaliação" },
@@ -786,11 +799,11 @@ function ProspeccaoPage() {
 
                   {/* A - Authority */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                    <label className="text-xs font-semibold text-foreground flex items-center justify-between flex-wrap gap-1">
                       <span>👑 [A] Authority (Autoridade)</span>
                       <span className="text-[10px] text-muted-foreground">É o tomador de decisão?</span>
                     </label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 sm:gap-2">
                       {[
                         { id: "ceo", label: "CEO / Diretor / Sócio" },
                         { id: "manager", label: "Gerente / Coordenador" },
@@ -814,11 +827,11 @@ function ProspeccaoPage() {
 
                   {/* N - Need */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                    <label className="text-xs font-semibold text-foreground flex items-center justify-between flex-wrap gap-1">
                       <span>🎯 [N] Need (Necessidade / Dor)</span>
                       <span className="text-[10px] text-muted-foreground">Qual a gravidade do problema?</span>
                     </label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 sm:gap-2">
                       {[
                         { id: "urgent", label: "Dor Crítica / Urgente" },
                         { id: "moderate", label: "Desejo de Melhoria" },
@@ -842,11 +855,11 @@ function ProspeccaoPage() {
 
                   {/* T - Timing */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                    <label className="text-xs font-semibold text-foreground flex items-center justify-between flex-wrap gap-1">
                       <span>⏱️ [T] Timing (Prazo de Decisão)</span>
                       <span className="text-[10px] text-muted-foreground">Quando pretende iniciar?</span>
                     </label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 sm:gap-2">
                       {[
                         { id: "now", label: "Imediato (< 15 dias)" },
                         { id: "soon", label: "30 a 60 dias" },
@@ -951,7 +964,7 @@ function ProspeccaoPage() {
                   ].map((cad, idx) => (
                     <div
                       key={idx}
-                      className="p-3 rounded-xl border bg-muted/20 flex items-start justify-between gap-2.5 hover:bg-muted/40 transition-colors"
+                      className="p-3 rounded-xl border bg-muted/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 hover:bg-muted/40 transition-colors min-w-0"
                     >
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
@@ -990,20 +1003,22 @@ function ProspeccaoPage() {
         <div className="space-y-4">
           {/* Barra de Filtros e Busca de Scripts */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1">
+            <div className="flex items-center gap-1 bg-muted/60 p-0.5 rounded-lg overflow-x-auto no-scrollbar shrink-0 w-full md:w-auto">
               {[
                 { id: "all", label: "Todos os Scripts" },
-                { id: "whatsapp", label: "💬 WhatsApp" },
-                { id: "phone", label: "📞 Telefone / Cold Call" },
-                { id: "objection", label: "🛡️ Quebra de Objeções" },
+                { id: "whatsapp", label: "WhatsApp" },
+                { id: "phone", label: "Cold Call" },
+                { id: "objection", label: "Quebra de Objeções" },
               ].map((tab) => (
                 <Button
                   key={tab.id}
-                  variant={scriptChannelFilter === tab.id ? "default" : "outline"}
+                  variant={scriptChannelFilter === tab.id ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setScriptChannelFilter(tab.id)}
-                  className={`text-xs h-8 cursor-pointer shrink-0 ${
-                    scriptChannelFilter === tab.id ? "bg-primary text-white" : ""
+                  className={`text-xs h-7.5 px-2.5 cursor-pointer font-medium shrink-0 ${
+                    scriptChannelFilter === tab.id
+                      ? "bg-[#FF6B00] text-white shadow-xs font-semibold"
+                      : "text-foreground hover:text-foreground"
                   }`}
                 >
                   {tab.label}
@@ -1041,7 +1056,7 @@ function ProspeccaoPage() {
 
                   <h3 className="font-bold text-sm text-foreground">{script.title}</h3>
 
-                  <div className="p-3 bg-muted/40 rounded-xl border border-border/40 font-mono text-xs text-foreground/90 whitespace-pre-line leading-relaxed">
+                  <div className="p-3 bg-muted/40 rounded-xl border border-border/40 font-mono text-xs text-foreground/90 whitespace-pre-line leading-relaxed break-words overflow-x-hidden">
                     {script.text}
                   </div>
 
@@ -1135,7 +1150,7 @@ function ProspeccaoPage() {
             </div>
 
             {/* Controles de Navegação de Slides */}
-            <div className="border-t pt-4 flex items-center justify-between">
+            <div className="border-t pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
               <div className="flex items-center gap-1.5">
                 {PITCH_DECK_SLIDES.map((_, index) => (
                   <button
@@ -1185,21 +1200,23 @@ function ProspeccaoPage() {
       {/* ========================================================================= */}
       {activeTab === "vault" && (
         <div className="space-y-4">
-          {/* Filtros de Categoria */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+          {/* Filtros de Categoria (Padronizados) */}
+          <div className="flex items-center gap-1 bg-muted/60 p-0.5 rounded-lg overflow-x-auto no-scrollbar shrink-0 w-full sm:w-auto">
             {[
               { id: "all", label: "Todos os Recursos" },
-              { id: "Planilhas de Vendas", label: "📊 Planilhas & Calculadoras" },
-              { id: "Documentos", label: "📄 Documentos & Minutas" },
-              { id: "Links Úteis", label: "🔗 Links & Ferramentas" },
+              { id: "Planilhas de Vendas", label: "Planilhas & Calculadoras" },
+              { id: "Documentos", label: "Documentos & Minutas" },
+              { id: "Links Úteis", label: "Links & Ferramentas" },
             ].map((tab) => (
               <Button
                 key={tab.id}
-                variant={resourceCategoryFilter === tab.id ? "default" : "outline"}
+                variant={resourceCategoryFilter === tab.id ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setResourceCategoryFilter(tab.id)}
-                className={`text-xs h-8 cursor-pointer shrink-0 ${
-                  resourceCategoryFilter === tab.id ? "bg-primary text-white" : ""
+                className={`text-xs h-7.5 px-2.5 cursor-pointer font-medium shrink-0 ${
+                  resourceCategoryFilter === tab.id
+                    ? "bg-[#FF6B00] text-white shadow-xs font-semibold"
+                    : "text-foreground hover:text-foreground"
                 }`}
               >
                 {tab.label}
@@ -1234,8 +1251,8 @@ function ProspeccaoPage() {
                       </Badge>
                     </div>
 
-                    <h4 className="font-bold text-sm text-foreground">{res.title}</h4>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
+                    <h4 className="font-bold text-sm text-foreground break-words">{res.title}</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed break-words">
                       {res.description}
                     </p>
                   </div>

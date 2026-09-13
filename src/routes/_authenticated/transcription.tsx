@@ -71,11 +71,14 @@ import {
   Check,
   ExternalLink,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   ListTodo,
   TrendingUp,
 } from "lucide-react";
 import { toast } from "sonner";
 import { TEAM_MEMBERS, TeamMember } from "./pipeline";
+import { useKpiCards } from "@/hooks/use-kpi-cards";
 
 export const Route = createFileRoute("/_authenticated/transcription")({
   head: () => ({ meta: [{ title: "Transcrição & Meeting Intelligence · Focus CRM" }] }),
@@ -410,6 +413,7 @@ const TYPE_CONFIG: Record<
 };
 
 function TranscriptionPage() {
+  const { collapsed: kpiCollapsed, toggle: toggleKpi } = useKpiCards();
   const [meetings, setMeetings] = useState<StructuredMeeting[]>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -813,8 +817,18 @@ function TranscriptionPage() {
         </div>
       </div>
 
+      {/* KPI Cards toggle — mobile only */}
+      <div className="md:hidden flex items-center justify-between">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Indicadores</span>
+        <button
+          onClick={toggleKpi}
+          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors py-0.5 px-2 rounded-md hover:bg-muted"
+        >
+          {kpiCollapsed ? <><ChevronDown className="h-3.5 w-3.5" /> Mostrar</> : <><ChevronUp className="h-3.5 w-3.5" /> Ocultar</>}
+        </button>
+      </div>
       {/* 2. Mini-Cockpit / KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+      <div className={kpiCollapsed ? "hidden md:grid grid-cols-2 md:grid-cols-4 gap-3.5" : "grid grid-cols-2 md:grid-cols-4 gap-3.5"}>
         <Card className="p-4 bg-card border-border/80 shadow-xs relative overflow-hidden group hover:border-primary/40 transition-colors">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">

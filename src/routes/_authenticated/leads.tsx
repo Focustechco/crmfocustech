@@ -75,6 +75,8 @@ import {
   FileText,
   Send,
   UserCheck,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -88,6 +90,7 @@ import {
   TagItem,
   TeamMember,
 } from "./pipeline";
+import { useKpiCards } from "@/hooks/use-kpi-cards";
 
 export const Route = createFileRoute("/_authenticated/leads")({
   head: () => ({ meta: [{ title: "Leads · Focus CRM" }] }),
@@ -302,6 +305,7 @@ const BRL = (num: number) =>
   }).format(num);
 
 export function LeadsPage() {
+  const { collapsed: kpiCollapsed, toggle: toggleKpi } = useKpiCards();
   const qc = useQueryClient();
 
   // 1. Estados Relacionais: Estágios, Etiquetas e Negócios do Pipeline
@@ -767,7 +771,17 @@ export function LeadsPage() {
       </div>
 
       {/* 2. Mini-KPIs no Topo */}
-      <div className="grid grid-cols-2 gap-3.5 md:grid-cols-4">
+      {/* KPI Cards toggle — mobile only */}
+      <div className="md:hidden flex items-center justify-between">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Indicadores</span>
+        <button
+          onClick={toggleKpi}
+          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors py-0.5 px-2 rounded-md hover:bg-muted"
+        >
+          {kpiCollapsed ? <><ChevronDown className="h-3.5 w-3.5" /> Mostrar</> : <><ChevronUp className="h-3.5 w-3.5" /> Ocultar</>}
+        </button>
+      </div>
+      <div className={kpiCollapsed ? "hidden md:grid grid-cols-2 gap-3.5 md:grid-cols-4" : "grid grid-cols-2 gap-3.5 md:grid-cols-4"}>
         <Card className="shadow-xs border-border/80">
           <CardContent className="p-4 flex items-center justify-between">
             <div>

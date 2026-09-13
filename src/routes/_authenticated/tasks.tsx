@@ -75,6 +75,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { TEAM_MEMBERS, TeamMember } from "./pipeline";
+import { useKpiCards } from "@/hooks/use-kpi-cards";
 
 export const Route = createFileRoute("/_authenticated/tasks")({
   head: () => ({ meta: [{ title: "Tarefas e Agenda · Focus CRM" }] }),
@@ -436,6 +437,7 @@ const formatBRL = (v: number) =>
 
 export function TasksAndAgendaPage() {
   const navigate = useNavigate();
+  const { collapsed: kpiCollapsed, toggle: toggleKpi } = useKpiCards();
   const [activeTab, setActiveTab] = useState<string>("agenda");
 
   const [meetings, setMeetings] = useState<MeetingItem[]>(() => {
@@ -1075,8 +1077,17 @@ export function TasksAndAgendaPage() {
         </div>
       </div>
 
-      {/* Cards de Métricas */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {/* Cards de Métricas — com toggle mobile */}
+      <div className="md:hidden flex items-center justify-between">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Indicadores</span>
+        <button
+          onClick={toggleKpi}
+          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors py-0.5 px-2 rounded-md hover:bg-muted"
+        >
+          {kpiCollapsed ? <><ChevronDown className="h-3.5 w-3.5" /> Mostrar</> : <><ChevronUp className="h-3.5 w-3.5" /> Ocultar</>}
+        </button>
+      </div>
+      <div className={kpiCollapsed ? "hidden md:grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4" : "grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4"}>
         <Card className="p-4 flex items-center justify-between border-l-4 border-l-blue-500 bg-card shadow-xs">
           <div className="space-y-1">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
@@ -1296,7 +1307,7 @@ export function TasksAndAgendaPage() {
                           )}
                         </div>
 
-                        <h3 className="text-base font-semibold text-foreground truncate">
+                        <h3 className="text-sm sm:text-base font-semibold text-foreground break-words line-clamp-2">
                           {meeting.title}
                         </h3>
 
@@ -1325,7 +1336,7 @@ export function TasksAndAgendaPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0 w-full md:w-auto justify-end border-t md:border-t-0 pt-3 md:pt-0">
+                    <div className="flex items-center gap-2 shrink-0 w-full md:w-auto justify-between sm:justify-end border-t md:border-t-0 pt-3 md:pt-0 flex-wrap">
                       <a
                         href={meeting.meetLink}
                         target="_blank"
@@ -2032,15 +2043,15 @@ export function TasksAndAgendaPage() {
                               {task.checklist.map((sub) => (
                                 <label
                                   key={sub.id}
-                                  className="flex items-center gap-2 text-xs p-1.5 rounded-md hover:bg-muted/50 cursor-pointer transition-colors"
+                                  className="flex items-start gap-2 text-xs p-1.5 rounded-md hover:bg-muted/50 cursor-pointer transition-colors min-w-0"
                                 >
                                   <Checkbox
                                     checked={sub.done}
                                     onCheckedChange={() => handleToggleSubtask(task.id, sub.id)}
-                                    className="data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
+                                    className="mt-0.5 shrink-0 data-[state=checked]:bg-emerald-600 data-[state=checked]:border-emerald-600"
                                   />
                                   <span
-                                    className={`truncate ${
+                                    className={`break-words text-xs min-w-0 flex-1 ${
                                       sub.done ? "line-through text-muted-foreground" : "text-foreground"
                                     }`}
                                   >
@@ -2052,7 +2063,7 @@ export function TasksAndAgendaPage() {
                           </div>
                         )}
 
-                        <div className="flex items-center justify-between pt-2 text-xs text-muted-foreground border-t">
+                        <div className="flex items-center justify-between pt-2 text-xs text-muted-foreground border-t gap-2 flex-wrap">
                           <div className="flex items-center gap-3">
                             <span className="flex items-center gap-1.5">
                               <Avatar className="h-4 w-4">
@@ -2132,7 +2143,7 @@ export function TasksAndAgendaPage() {
 
               return (
                 <Card key={member.id} className="p-5 space-y-4 bg-card border shadow-xs">
-                  <div className="flex items-center justify-between border-b pb-3">
+                  <div className="flex items-center justify-between border-b pb-3 flex-wrap gap-2">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10 border-2 border-primary/20">
                         <AvatarImage src={member.avatar} />
@@ -2173,7 +2184,7 @@ export function TasksAndAgendaPage() {
                             key={goal.id}
                             className="p-3 rounded-lg border bg-background/50 space-y-2 hover:border-primary/30 transition-colors"
                           >
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between flex-wrap gap-2">
                               <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                                 <Target className="h-3.5 w-3.5 text-[#FF6B00]" />
                                 {goal.title}
