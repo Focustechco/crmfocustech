@@ -3,7 +3,7 @@ import {
   LayoutDashboard,
   Users,
   KanbanSquare,
-  Building2,
+  Target,
   CheckSquare,
   MessageCircle,
   Mail,
@@ -35,7 +35,7 @@ const mainItems = [
   { title: "Pipeline", url: "/pipeline", icon: KanbanSquare },
   { title: "Negócios", url: "/deals", icon: Wallet },
   { title: "Tarefas", url: "/tasks", icon: CheckSquare },
-  { title: "Clientes", url: "/clients", icon: Building2 },
+  { title: "Comercial OS", url: "/clients", icon: Target },
 ];
 
 const soonItems = [

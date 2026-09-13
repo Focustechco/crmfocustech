@@ -20,7 +20,7 @@ const getModuleTitle = (path: string) => {
   if (path.startsWith("/pipeline")) return "Funil de Leads";
   if (path.startsWith("/leads")) return "Leads";
   if (path.startsWith("/deals")) return "Negócios";
-  if (path.startsWith("/clients")) return "Clientes";
+  if (path.startsWith("/clients")) return "Comercial OS";
   if (path.startsWith("/tasks")) return "Tarefas";
   if (path.startsWith("/settings")) return "Configurações";
   return "Focus CRM";
