@@ -854,17 +854,14 @@ export function PipelinePage() {
 
   return (
     <div className="flex flex-col gap-3.5 min-h-[calc(100vh-5rem)]">
-      {/* 1. Header com Título, Estatísticas e Filtros */}
+      {/* 1. Header com Título e Filtros */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
+          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground">
             Funil de Leads
-            <span className="text-xs px-2 py-0.5 rounded-full bg-[#FF6B00]/10 text-[#FF6B00] border border-[#FF6B00]/20 font-mono font-medium">
-              {BRL(totalPipelineValue)}
-            </span>
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Acompanhe seu funil de leads com etiquetas personalizadas estilo Trello.
+            Acompanhe seu funil de leads e nunca perca uma oportunidade.
           </p>
         </div>
 
@@ -902,7 +899,7 @@ export function PipelinePage() {
             </button>
           </div>
 
-          {/* Filtro por Etiqueta (Trello Style) */}
+          {/* Filtro por Etiqueta */}
           <div className="w-[150px] shrink-0">
             <Select value={selectedTagFilter} onValueChange={setSelectedTagFilter}>
               <SelectTrigger className="h-9 bg-card text-xs">
@@ -959,16 +956,16 @@ export function PipelinePage() {
             </Select>
           </div>
 
-          {/* Botão Gerenciar Etiquetas */}
+          {/* Botão Gerenciar Etiquetas: Apenas Ícone */}
           <Button
             variant="outline"
-            size="sm"
+            size="icon"
             onClick={() => handleOpenCreateTagModal()}
-            className="h-9 px-2.5 text-xs bg-card border-border/80 text-foreground hover:text-[#FF6B00] shrink-0 gap-1.5"
-            title="Criar ou gerenciar etiquetas"
+            className="h-9 w-9 bg-card border-border/80 text-foreground hover:text-[#FF6B00] shrink-0"
+            title="Gerenciar etiquetas"
+            aria-label="Gerenciar etiquetas"
           >
-            <Tag className="h-3.5 w-3.5 text-[#FF6B00]" />
-            <span className="hidden sm:inline">Etiquetas</span>
+            <Tag className="h-4 w-4 text-[#FF6B00]" />
           </Button>
 
           {/* Botão Novo Negócio: Ícone '+' na mesma linha */}
@@ -984,7 +981,7 @@ export function PipelinePage() {
         </div>
       </div>
 
-      {/* 2. Colunas Kanban com Cards estilo Trello */}
+      {/* 2. Colunas Kanban com Cards */}
       <div className="flex gap-4 overflow-x-auto pb-6 pt-1 items-start flex-1">
         {stages.map((stage) => {
           const stat = stageStats.get(stage.id) || { count: 0, totalValue: 0 };
@@ -1080,7 +1077,7 @@ export function PipelinePage() {
                         draggingDealId === deal.id && "opacity-50 scale-95"
                       )}
                     >
-                      {/* Topo do Card: ETIQUETAS ESTILO TRELLO (Substituindo o #1789) */}
+                      {/* Topo do Card: Etiquetas */}
                       <div className="flex items-start justify-between gap-1.5 mb-2">
                         <div className="flex items-center gap-1 flex-wrap min-w-0 flex-1">
                           {dealTags.map((tag) => (
@@ -1101,51 +1098,6 @@ export function PipelinePage() {
                               <span className="truncate max-w-[85px]">{tag.name}</span>
                             </span>
                           ))}
-
-                          {/* Seletor Rápido de Etiquetas */}
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button
-                                type="button"
-                                className="h-4 px-1 rounded text-muted-foreground/60 hover:text-foreground hover:bg-muted border border-dashed border-border/80 text-[9px] flex items-center gap-0.5 transition-colors"
-                                title="Gerenciar etiquetas"
-                              >
-                                <Plus className="h-2.5 w-2.5" />
-                                {dealTags.length === 0 && <span>Etiqueta</span>}
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="w-48 p-1.5">
-                              <div className="text-[10px] font-bold text-muted-foreground px-2 py-1 uppercase tracking-wider">
-                                Etiquetas
-                              </div>
-                              {tags.map((t) => {
-                                const isSelected = (deal.tag_ids || []).includes(t.id);
-                                return (
-                                  <DropdownMenuItem
-                                    key={t.id}
-                                    onClick={() => handleToggleDealTag(deal.id, t.id)}
-                                    className="flex items-center justify-between py-1.5 px-2 cursor-pointer text-xs"
-                                  >
-                                    <div className="flex items-center gap-2 min-w-0">
-                                      <span
-                                        className="w-2.5 h-2.5 rounded-full shrink-0"
-                                        style={{ backgroundColor: t.color }}
-                                      />
-                                      <span className="truncate">{t.name}</span>
-                                    </div>
-                                    {isSelected && <Check className="h-3.5 w-3.5 text-[#FF6B00]" />}
-                                  </DropdownMenuItem>
-                                );
-                              })}
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                onClick={() => handleOpenCreateTagModal()}
-                                className="text-xs text-[#FF6B00] font-medium py-1.5"
-                              >
-                                <Plus className="h-3.5 w-3.5 mr-1.5" /> Criar nova etiqueta
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
                         </div>
 
                         {/* Menu de Ações do Card */}
@@ -1231,7 +1183,7 @@ export function PipelinePage() {
                         draggingDealId === deal.id && "opacity-50 scale-95"
                       )}
                     >
-                      {/* Topo do Card: ETIQUETAS ESTILO TRELLO (Substituindo o #1789) */}
+                      {/* Topo do Card: Etiquetas e Menu */}
                       <div className="flex items-start justify-between gap-1.5 mb-2.5">
                         <div className="flex items-center gap-1.5 flex-wrap min-w-0 flex-1">
                           {dealTags.map((tag) => (
@@ -1252,51 +1204,6 @@ export function PipelinePage() {
                               <span className="truncate max-w-[120px]">{tag.name}</span>
                             </span>
                           ))}
-
-                          {/* Seletor Rápido de Etiquetas */}
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button
-                                type="button"
-                                className="h-5 px-1.5 rounded-md text-muted-foreground/70 hover:text-foreground hover:bg-muted border border-dashed border-border/80 text-[10px] flex items-center gap-1 transition-colors"
-                                title="Adicionar ou alterar etiquetas"
-                              >
-                                <Tag className="h-2.5 w-2.5" />
-                                {dealTags.length === 0 && <span>+ Etiqueta</span>}
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="w-52 p-1.5">
-                              <div className="text-[10px] font-bold text-muted-foreground px-2 py-1 uppercase tracking-wider">
-                                Etiquetas do Negócio
-                              </div>
-                              {tags.map((t) => {
-                                const isSelected = (deal.tag_ids || []).includes(t.id);
-                                return (
-                                  <DropdownMenuItem
-                                    key={t.id}
-                                    onClick={() => handleToggleDealTag(deal.id, t.id)}
-                                    className="flex items-center justify-between py-1.5 px-2 cursor-pointer text-xs"
-                                  >
-                                    <div className="flex items-center gap-2 min-w-0">
-                                      <span
-                                        className="w-2.5 h-2.5 rounded-full shrink-0"
-                                        style={{ backgroundColor: t.color }}
-                                      />
-                                      <span className="truncate">{t.name}</span>
-                                    </div>
-                                    {isSelected && <Check className="h-3.5 w-3.5 text-[#FF6B00]" />}
-                                  </DropdownMenuItem>
-                                );
-                              })}
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem
-                                onClick={() => handleOpenCreateTagModal()}
-                                className="text-xs text-[#FF6B00] font-medium py-1.5"
-                              >
-                                <Plus className="h-3.5 w-3.5 mr-1.5" /> Criar nova etiqueta
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
                         </div>
 
                         <DropdownMenu>
@@ -1498,12 +1405,12 @@ export function PipelinePage() {
               </div>
             </div>
 
-            {/* Seção de ETIQUETAS RELACIONAIS ESTILO TRELLO */}
+            {/* Seção de ETIQUETAS RELACIONAIS */}
             <div className="p-3 bg-muted/30 rounded-xl border border-border/70 space-y-2.5">
               <div className="flex items-center justify-between">
                 <Label className="text-xs font-bold text-foreground flex items-center gap-1.5">
                   <Tag className="h-3.5 w-3.5 text-[#FF6B00]" />
-                  Etiquetas do Negócio (Trello Style)
+                  Etiquetas do Negócio
                 </Label>
                 <button
                   type="button"
@@ -1678,7 +1585,7 @@ export function PipelinePage() {
           <DialogHeader>
             <DialogTitle className="font-display text-base font-bold flex items-center gap-2">
               <Tag className="h-4 w-4 text-[#FF6B00]" />
-              {editingTagId ? "Editar Etiqueta" : "Nova Etiqueta (Trello Style)"}
+              {editingTagId ? "Editar Etiqueta" : "Nova Etiqueta"}
             </DialogTitle>
           </DialogHeader>
 
