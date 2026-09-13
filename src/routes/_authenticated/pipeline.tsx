@@ -18,6 +18,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -34,9 +35,7 @@ import {
   MoreVertical,
   Plus,
   Users,
-  ChevronRight,
   Filter,
-  CalendarDays,
   Trash2,
   Edit2,
   User,
@@ -44,6 +43,8 @@ import {
   Palette,
   LayoutGrid,
   Rows3,
+  Tag,
+  Check,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -68,9 +69,15 @@ export interface TeamMember {
   role?: string;
 }
 
+export interface TagItem {
+  id: string;
+  name: string;
+  color: string;
+}
+
 export interface DealItem {
   id: string;
-  code: string;
+  code?: string;
   title: string;
   value: number;
   stage_id: string;
@@ -79,8 +86,9 @@ export interface DealItem {
   company_name: string;
   responsible: TeamMember;
   co_responsible?: TeamMember;
-  tag: string;
-  tag_color: string;
+  tag_ids?: string[];
+  tag?: string;
+  tag_color?: string;
   activity_title: string;
   activity_date: string;
   phone?: string;
@@ -89,6 +97,36 @@ export interface DealItem {
   status: "open" | "won" | "lost";
   created_at: string;
 }
+
+// Paleta de Cores Trello Style para Etiquetas
+export const TAG_PALETTE = [
+  { label: "Laranja Focus", value: "#FF6B00" },
+  { label: "Vermelho Urgente", value: "#EF4444" },
+  { label: "Coral Quente", value: "#F97316" },
+  { label: "Âmbar Alerta", value: "#F59E0B" },
+  { label: "Verde Esmeralda", value: "#10B981" },
+  { label: "Ciano Destaque", value: "#06B6D4" },
+  { label: "Azul Primário", value: "#3B82F6" },
+  { label: "Índigo Profundo", value: "#6366F1" },
+  { label: "Roxo VIP", value: "#8B5CF6" },
+  { label: "Rosa Negócio", value: "#EC4899" },
+  { label: "Grafite Neutro", value: "#64748B" },
+];
+
+// Etiquetas Relacionais Iniciais (Trello Style)
+export const INITIAL_TAGS: TagItem[] = [
+  { id: "tag-proposta", name: "PROPOSTA", color: "#FF6B00" },
+  { id: "tag-contato", name: "CONTATO", color: "#3B82F6" },
+  { id: "tag-docs", name: "DOCUMENTOS", color: "#F59E0B" },
+  { id: "tag-urgente", name: "URGENTE", color: "#EF4444" },
+  { id: "tag-vip", name: "CLIENTE VIP", color: "#8B5CF6" },
+  { id: "tag-negociacao", name: "NEGOCIAÇÃO", color: "#EC4899" },
+  { id: "tag-analise", name: "ANÁLISE", color: "#6366F1" },
+  { id: "tag-contrato", name: "CONTRATO", color: "#06B6D4" },
+  { id: "tag-fatura", name: "FATURA", color: "#A855F7" },
+  { id: "tag-andamento", name: "EM ANDAMENTO", color: "#10B981" },
+  { id: "tag-entrega", name: "ENTREGA", color: "#14B8A6" },
+];
 
 // Equipe padrão
 const TEAM_MEMBERS: TeamMember[] = [
@@ -352,6 +390,8 @@ const BRL = (num: number) =>
 
 export function PipelinePage() {
   const qc = useQueryClient();
+
+  // 1. Estados Relacionais: Estágios, Etiquetas e Negócios
   const [stages, setStages] = useState<PipelineStage[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("focus_crm_stages_store");
@@ -364,12 +404,34 @@ export function PipelinePage() {
     return INITIAL_STAGES;
   });
 
+  const [tags, setTags] = useState<TagItem[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("focus_crm_tags_store");
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {}
+      }
+    }
+    return INITIAL_TAGS;
+  });
+
   const [deals, setDeals] = useState<DealItem[]>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("focus_crm_deals_store");
       if (saved) {
         try {
-          return JSON.parse(saved);
+          const parsed: DealItem[] = JSON.parse(saved);
+          return parsed.map((d) => {
+            if (!d.tag_ids || d.tag_ids.length === 0) {
+              if (d.tag) {
+                const found = INITIAL_TAGS.find((t) => t.name.toLowerCase() === d.tag?.toLowerCase());
+                return { ...d, tag_ids: found ? [found.id] : ["tag-proposta"] };
+              }
+              return { ...d, tag_ids: [] };
+            }
+            return d;
+          });
         } catch {}
       }
     }
@@ -400,9 +462,52 @@ export function PipelinePage() {
     }
   };
 
+  // Salvar etiquetas localmente
+  const saveTags = (updated: TagItem[]) => {
+    setTags(updated);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("focus_crm_tags_store", JSON.stringify(updated));
+    }
+  };
+
+  // Persistir negócios localmente
+  const saveDeals = (updated: DealItem[]) => {
+    setDeals(updated);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("focus_crm_deals_store", JSON.stringify(updated));
+    }
+  };
+
+  // Helper para resolver lista de tags de um negócio
+  const getDealTags = (deal: DealItem): TagItem[] => {
+    if (deal.tag_ids && deal.tag_ids.length > 0) {
+      return deal.tag_ids
+        .map((id) => tags.find((t) => t.id === id))
+        .filter((t): t is TagItem => Boolean(t));
+    }
+    if (deal.tag) {
+      const found = tags.find((t) => t.name.toLowerCase() === deal.tag?.toLowerCase());
+      if (found) return [found];
+    }
+    return [];
+  };
+
+  // Alternar tag diretamente do card em 1 clique
+  const handleToggleDealTag = (dealId: string, tagId: string) => {
+    const updated = deals.map((d) => {
+      if (d.id !== dealId) return d;
+      const current = d.tag_ids || [];
+      const exists = current.includes(tagId);
+      const next = exists ? current.filter((id) => id !== tagId) : [...current, tagId];
+      return { ...d, tag_ids: next };
+    });
+    saveDeals(updated);
+  };
+
   // Filtros
   const [selectedResponsible, setSelectedResponsible] = useState<string>("all");
   const [selectedStageFilter, setSelectedStageFilter] = useState<string>("all");
+  const [selectedTagFilter, setSelectedTagFilter] = useState<string>("all");
   const [selectedPeriod, setSelectedPeriod] = useState<string>("30");
 
   // Drag & Drop
@@ -419,28 +524,24 @@ export function PipelinePage() {
   const [editingStageId, setEditingStageId] = useState<string | null>(null);
   const [stageName, setStageName] = useState("");
   const [stageColor, setStageColor] = useState("#FF6B00");
-  const [stageInsertPosition, setStageInsertPosition] = useState<number>(0);
+
+  // Modal de Criação / Gerenciamento de Etiquetas (Tags)
+  const [isTagModalOpen, setIsTagModalOpen] = useState(false);
+  const [editingTagId, setEditingTagId] = useState<string | null>(null);
+  const [tagName, setTagName] = useState("");
+  const [tagColor, setTagColor] = useState("#FF6B00");
 
   // Form State do Negócio
-  const [formCode, setFormCode] = useState("");
   const [formTitle, setFormTitle] = useState("");
   const [formValue, setFormValue] = useState("");
   const [formClientName, setFormClientName] = useState("");
   const [formCompanyName, setFormCompanyName] = useState("");
   const [formResponsibleId, setFormResponsibleId] = useState("user-1");
-  const [formTag, setFormTag] = useState("PROPOSTA");
+  const [formTagIds, setFormTagIds] = useState<string[]>(["tag-proposta"]);
   const [formActivityDate, setFormActivityDate] = useState("Hoje");
   const [formPhone, setFormPhone] = useState("");
   const [formWhatsapp, setFormWhatsapp] = useState("");
   const [formNotes, setFormNotes] = useState("");
-
-  // Persistir negócios localmente
-  const saveDeals = (updated: DealItem[]) => {
-    setDeals(updated);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("focus_crm_deals_store", JSON.stringify(updated));
-    }
-  };
 
   // Abrir Modal de Edição de Etapa
   const handleOpenEditStageModal = (stage: PipelineStage) => {
@@ -450,12 +551,11 @@ export function PipelinePage() {
     setIsStageModalOpen(true);
   };
 
-  // Abrir Modal de Nova Etapa
-  const handleOpenAddStageModal = (position?: number) => {
+  // Abrir Modal de Inserção de Nova Coluna
+  const handleOpenAddStageModal = () => {
     setEditingStageId(null);
     setStageName("");
-    setStageColor("#FF6B00");
-    setStageInsertPosition(position ?? stages.length);
+    setStageColor(STAGE_COLORS[stages.length % STAGE_COLORS.length].value);
     setIsStageModalOpen(true);
   };
 
@@ -463,25 +563,24 @@ export function PipelinePage() {
   const handleSaveStage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!stageName.trim()) {
-      return toast.error("Informe o nome da etapa");
+      return toast.error("Informe o nome da coluna");
     }
 
     if (editingStageId) {
       const updated = stages.map((s) =>
-        s.id === editingStageId ? { ...s, name: stageName, color: stageColor } : s
+        s.id === editingStageId ? { ...s, name: stageName.trim(), color: stageColor } : s
       );
       saveStages(updated);
-      toast.success("Coluna atualizada!");
+      toast.success("Coluna atualizada com sucesso!");
     } else {
       const newStage: PipelineStage = {
         id: `stage-${Date.now()}`,
-        name: stageName,
+        name: stageName.trim(),
         color: stageColor,
-        position: stageInsertPosition,
+        position: stages.length,
       };
-      const updated = [...stages, newStage];
-      saveStages(updated);
-      toast.success("Nova coluna criada no funil!");
+      saveStages([...stages, newStage]);
+      toast.success("Nova coluna criada com sucesso!");
     }
 
     setIsStageModalOpen(false);
@@ -490,40 +589,89 @@ export function PipelinePage() {
   // Excluir Etapa
   const handleDeleteStage = (stageId: string) => {
     if (stages.length <= 1) {
-      return toast.error("O funil precisa ter pelo menos 1 coluna");
+      return toast.error("O funil deve conter ao menos uma coluna.");
     }
-    const updated = stages.filter((s) => s.id !== stageId);
-    saveStages(updated);
-    toast.success("Coluna removida do funil");
+    const updatedStages = stages.filter((s) => s.id !== stageId);
+    saveStages(updatedStages);
+
+    const fallbackStageId = updatedStages[0].id;
+    const updatedDeals = deals.map((d) =>
+      d.stage_id === stageId ? { ...d, stage_id: fallbackStageId } : d
+    );
+    saveDeals(updatedDeals);
+
+    toast.success("Coluna removida.");
   };
 
-  // Buscar clientes relacionais do Supabase se existirem
+  // Abrir Modal de Criação / Edição de Etiqueta
+  const handleOpenCreateTagModal = (tagToEdit?: TagItem) => {
+    if (tagToEdit) {
+      setEditingTagId(tagToEdit.id);
+      setTagName(tagToEdit.name);
+      setTagColor(tagToEdit.color);
+    } else {
+      setEditingTagId(null);
+      setTagName("");
+      setTagColor(TAG_PALETTE[Math.floor(Math.random() * TAG_PALETTE.length)].value);
+    }
+    setIsTagModalOpen(true);
+  };
+
+  // Salvar Etiqueta
+  const handleSaveTag = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tagName.trim()) {
+      return toast.error("Informe o nome da etiqueta");
+    }
+
+    const cleanName = tagName.trim().toUpperCase();
+
+    if (editingTagId) {
+      const updated = tags.map((t) =>
+        t.id === editingTagId ? { ...t, name: cleanName, color: tagColor } : t
+      );
+      saveTags(updated);
+      toast.success("Etiqueta atualizada!");
+    } else {
+      const newTag: TagItem = {
+        id: `tag-${Date.now()}`,
+        name: cleanName,
+        color: tagColor,
+      };
+      const updated = [...tags, newTag];
+      saveTags(updated);
+      setFormTagIds((prev) => [...prev, newTag.id]);
+      toast.success(`Etiqueta "${cleanName}" criada com sucesso!`);
+    }
+
+    setIsTagModalOpen(false);
+  };
+
+  // Excluir Etiqueta
+  const handleDeleteTag = (tagId: string) => {
+    const updated = tags.filter((t) => t.id !== tagId);
+    saveTags(updated);
+    const updatedDeals = deals.map((d) => ({
+      ...d,
+      tag_ids: (d.tag_ids || []).filter((id) => id !== tagId),
+    }));
+    saveDeals(updatedDeals);
+    setFormTagIds((prev) => prev.filter((id) => id !== tagId));
+    toast.success("Etiqueta removida.");
+  };
+
+  // Carregar leads do Supabase para autocomplete relacional
   const { data: dbLeads = [] } = useQuery({
-    queryKey: ["relational-leads"],
+    queryKey: ["leads-autocomplete"],
     queryFn: async () => {
-      try {
-        const { data } = await supabase.from("leads").select("id, name, company, phone, whatsapp");
-        return data ?? [];
-      } catch {
-        return [];
-      }
+      const { data, error } = await supabase
+        .from("leads")
+        .select("id, name, company, phone, whatsapp, tags")
+        .limit(100);
+      if (error) return [];
+      return data || [];
     },
   });
-
-  // Cálculo de estatísticas por etapa
-  const stageStats = useMemo(() => {
-    const map = new Map<string, { count: number; totalValue: number }>();
-    stages.forEach((s) => map.set(s.id, { count: 0, totalValue: 0 }));
-
-    deals.forEach((deal) => {
-      const cur = map.get(deal.stage_id) || { count: 0, totalValue: 0 };
-      map.set(deal.stage_id, {
-        count: cur.count + 1,
-        totalValue: cur.totalValue + Number(deal.value || 0),
-      });
-    });
-    return map;
-  }, [stages, deals]);
 
   // Filtragem de Deals
   const filteredDeals = useMemo(() => {
@@ -534,9 +682,29 @@ export function PipelinePage() {
       if (selectedStageFilter !== "all" && deal.stage_id !== selectedStageFilter) {
         return false;
       }
+      if (selectedTagFilter !== "all") {
+        const dealTags = deal.tag_ids || [];
+        if (!dealTags.includes(selectedTagFilter)) return false;
+      }
       return true;
     });
-  }, [deals, selectedResponsible, selectedStageFilter]);
+  }, [deals, selectedResponsible, selectedStageFilter, selectedTagFilter]);
+
+  // Estatísticas por Etapa
+  const stageStats = useMemo(() => {
+    const map = new Map<string, { count: number; totalValue: number }>();
+    stages.forEach((s) => map.set(s.id, { count: 0, totalValue: 0 }));
+
+    filteredDeals.forEach((deal) => {
+      const curr = map.get(deal.stage_id) || { count: 0, totalValue: 0 };
+      map.set(deal.stage_id, {
+        count: curr.count + 1,
+        totalValue: curr.totalValue + Number(deal.value || 0),
+      });
+    });
+
+    return map;
+  }, [stages, filteredDeals]);
 
   // Total do Pipeline filtrado
   const totalPipelineValue = useMemo(() => {
@@ -577,16 +745,14 @@ export function PipelinePage() {
 
   // Abrir Modal de Criação Rápida
   const handleOpenCreateModal = (stageId: string = "stage-1") => {
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
     setEditingDealId(null);
     setModalStageId(stageId);
-    setFormCode(`#${randomNum}`);
-    setFormTitle(`Negócio #${randomNum}`);
+    setFormTitle("Novo Negócio");
     setFormValue("");
     setFormClientName("");
     setFormCompanyName("");
     setFormResponsibleId(TEAM_MEMBERS[0].id);
-    setFormTag("PROPOSTA");
+    setFormTagIds(["tag-proposta"]);
     setFormActivityDate("Hoje");
     setFormPhone("");
     setFormWhatsapp("");
@@ -598,13 +764,12 @@ export function PipelinePage() {
   const handleOpenEditModal = (deal: DealItem) => {
     setEditingDealId(deal.id);
     setModalStageId(deal.stage_id);
-    setFormCode(deal.code);
     setFormTitle(deal.title);
     setFormValue(String(deal.value));
     setFormClientName(deal.client_name);
     setFormCompanyName(deal.company_name);
     setFormResponsibleId(deal.responsible.id);
-    setFormTag(deal.tag);
+    setFormTagIds(deal.tag_ids || (deal.tag ? ["tag-proposta"] : []));
     setFormActivityDate(deal.activity_date);
     setFormPhone(deal.phone || "");
     setFormWhatsapp(deal.whatsapp || "");
@@ -620,62 +785,51 @@ export function PipelinePage() {
     }
 
     const resp = TEAM_MEMBERS.find((m) => m.id === formResponsibleId) || TEAM_MEMBERS[0];
-    const val = Number(formValue.replace(/[^0-9]/g, "")) || Number(formValue) || 0;
-
-    let tagColor = "bg-orange-100 text-orange-700 dark:bg-orange-950/50 dark:text-orange-300";
-    if (formTag === "CONTATO") tagColor = "bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300";
-    if (formTag === "DOCUMENTOS") tagColor = "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300";
-    if (formTag === "NEGOCIAÇÃO") tagColor = "bg-rose-100 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300";
-    if (formTag === "CONTRATO") tagColor = "bg-indigo-100 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300";
-    if (formTag === "FATURA") tagColor = "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-950/50 dark:text-fuchsia-300";
-    if (formTag === "ENTREGA" || formTag === "EM ANDAMENTO") tagColor = "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300";
+    const val = Number(formValue) || 0;
 
     if (editingDealId) {
-      const updated = deals.map((d) => {
-        if (d.id === editingDealId) {
-          return {
-            ...d,
-            code: formCode,
-            title: formTitle,
-            value: val,
-            stage_id: modalStageId,
-            client_name: formClientName || "Cliente",
-            company_name: formCompanyName || "Empresa",
-            responsible: resp,
-            tag: formTag,
-            tag_color: tagColor,
-            activity_date: formActivityDate,
-            phone: formPhone,
-            whatsapp: formWhatsapp,
-            notes: formNotes,
-          };
-        }
-        return d;
-      });
+      const updated = deals.map((d) =>
+        d.id === editingDealId
+          ? {
+              ...d,
+              title: formTitle.trim(),
+              value: val,
+              stage_id: modalStageId,
+              client_name: formClientName.trim() || "Cliente",
+              company_name: formCompanyName.trim(),
+              responsible: resp,
+              tag_ids: formTagIds,
+              activity_date: formActivityDate.trim() || "Hoje",
+              phone: formPhone.trim(),
+              whatsapp: formWhatsapp.trim(),
+              notes: formNotes.trim(),
+            }
+          : d
+      );
       saveDeals(updated);
-      toast.success("Negócio atualizado!");
+      toast.success("Negócio atualizado com sucesso!");
     } else {
+      const randomNum = Math.floor(1000 + Math.random() * 9000);
       const newDeal: DealItem = {
         id: `deal-${Date.now()}`,
-        code: formCode || `#${Math.floor(1000 + Math.random() * 9000)}`,
-        title: formTitle,
+        code: `#${randomNum}`,
+        title: formTitle.trim(),
         value: val,
         stage_id: modalStageId,
-        client_name: formClientName || "Novo Cliente",
-        company_name: formCompanyName || "Empresa",
+        client_name: formClientName.trim() || "Cliente Novo",
+        company_name: formCompanyName.trim() || "",
         responsible: resp,
-        tag: formTag,
-        tag_color: tagColor,
+        tag_ids: formTagIds,
         activity_title: "Atividade",
-        activity_date: formActivityDate || "Hoje",
-        phone: formPhone,
-        whatsapp: formWhatsapp,
-        notes: formNotes,
+        activity_date: formActivityDate.trim() || "Hoje",
+        phone: formPhone.trim(),
+        whatsapp: formWhatsapp.trim(),
+        notes: formNotes.trim(),
         status: "open",
         created_at: new Date().toISOString(),
       };
       saveDeals([newDeal, ...deals]);
-      toast.success("Novo negócio criado!");
+      toast.success("Negócio adicionado ao funil!");
     }
 
     setIsModalOpen(false);
@@ -700,18 +854,21 @@ export function PipelinePage() {
 
   return (
     <div className="flex flex-col gap-3.5 min-h-[calc(100vh-5rem)]">
-      {/* 1. Header com Título e Filtros */}
+      {/* 1. Header com Título, Estatísticas e Filtros */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+          <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
             Funil de Leads
+            <span className="text-xs px-2 py-0.5 rounded-full bg-[#FF6B00]/10 text-[#FF6B00] border border-[#FF6B00]/20 font-mono font-medium">
+              {BRL(totalPipelineValue)}
+            </span>
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Acompanhe seu funil de leads e nunca perca uma oportunidade.
+            Acompanhe seu funil de leads com etiquetas personalizadas estilo Trello.
           </p>
         </div>
 
-        {/* Filtros, Alternador de Visualização e Botão Novo Negócio na mesma linha */}
+        {/* Filtros, Alternador de Visualização, Gerenciador de Tags e Botão Novo Negócio */}
         <div className="flex items-center gap-2 flex-wrap lg:flex-nowrap">
           {/* Alternador de Visualização: Ícones Apenas (Detalhado vs Resumido) */}
           <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/80 shrink-0">
@@ -745,8 +902,29 @@ export function PipelinePage() {
             </button>
           </div>
 
+          {/* Filtro por Etiqueta (Trello Style) */}
+          <div className="w-[150px] shrink-0">
+            <Select value={selectedTagFilter} onValueChange={setSelectedTagFilter}>
+              <SelectTrigger className="h-9 bg-card text-xs">
+                <Tag className="mr-1.5 h-3.5 w-3.5 text-[#FF6B00]" />
+                <SelectValue placeholder="Etiquetas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas as etiquetas</SelectItem>
+                {tags.map((t) => (
+                  <SelectItem key={t.id} value={t.id}>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: t.color }} />
+                      <span>{t.name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Responsável */}
-          <div className="w-[160px] shrink-0">
+          <div className="w-[155px] shrink-0">
             <Select value={selectedResponsible} onValueChange={setSelectedResponsible}>
               <SelectTrigger className="h-9 bg-card text-xs">
                 <Users className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
@@ -764,7 +942,7 @@ export function PipelinePage() {
           </div>
 
           {/* Fases */}
-          <div className="w-[140px] shrink-0">
+          <div className="w-[135px] shrink-0">
             <Select value={selectedStageFilter} onValueChange={setSelectedStageFilter}>
               <SelectTrigger className="h-9 bg-card text-xs">
                 <Filter className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
@@ -781,21 +959,17 @@ export function PipelinePage() {
             </Select>
           </div>
 
-          {/* Período */}
-          <div className="w-[130px] shrink-0">
-            <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
-              <SelectTrigger className="h-9 bg-card text-xs">
-                <CalendarDays className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
-                <SelectValue placeholder="Período" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="7">Últimos 7 dias</SelectItem>
-                <SelectItem value="30">Últimos 30 dias</SelectItem>
-                <SelectItem value="90">Últimos 90 dias</SelectItem>
-                <SelectItem value="365">Este ano</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Botão Gerenciar Etiquetas */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleOpenCreateTagModal()}
+            className="h-9 px-2.5 text-xs bg-card border-border/80 text-foreground hover:text-[#FF6B00] shrink-0 gap-1.5"
+            title="Criar ou gerenciar etiquetas"
+          >
+            <Tag className="h-3.5 w-3.5 text-[#FF6B00]" />
+            <span className="hidden sm:inline">Etiquetas</span>
+          </Button>
 
           {/* Botão Novo Negócio: Ícone '+' na mesma linha */}
           <Button
@@ -810,7 +984,7 @@ export function PipelinePage() {
         </div>
       </div>
 
-      {/* Colunas Kanban */}
+      {/* 2. Colunas Kanban com Cards estilo Trello */}
       <div className="flex gap-4 overflow-x-auto pb-6 pt-1 items-start flex-1">
         {stages.map((stage) => {
           const stat = stageStats.get(stage.id) || { count: 0, totalValue: 0 };
@@ -875,7 +1049,7 @@ export function PipelinePage() {
                       <DropdownMenuItem onClick={() => handleOpenEditStageModal(stage)}>
                         <Edit2 className="h-3.5 w-3.5 mr-2" /> Editar coluna
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleOpenAddStageModal(stage.position + 1)}>
+                      <DropdownMenuItem onClick={() => handleOpenAddStageModal()}>
                         <Plus className="h-3.5 w-3.5 mr-2" /> Inserir coluna
                       </DropdownMenuItem>
                       <DropdownMenuItem
@@ -892,22 +1066,90 @@ export function PipelinePage() {
 
               {/* Lista de Cards de Negócio */}
               <div className="flex flex-col gap-2.5 flex-1">
-                {stageDeals.map((deal) =>
-                  cardViewMode === "compact" ? (
+                {stageDeals.map((deal) => {
+                  const dealTags = getDealTags(deal);
+
+                  return cardViewMode === "compact" ? (
                     /* Card Resumido / Minimizado */
                     <div
                       key={deal.id}
                       draggable
                       onDragStart={(e) => handleDragStart(e, deal.id)}
                       className={cn(
-                        "group relative bg-card text-card-foreground rounded-xl p-2.5 border border-border/80 shadow-xs hover:shadow-md transition-all cursor-grab active:cursor-grabbing",
+                        "group relative bg-card text-card-foreground rounded-xl p-3 border border-border/80 shadow-xs hover:shadow-md transition-all cursor-grab active:cursor-grabbing",
                         draggingDealId === deal.id && "opacity-50 scale-95"
                       )}
                     >
-                      <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1">
-                        <span className="font-mono font-medium text-[10px]">{deal.code}</span>
-                        <div className="flex items-center gap-1">
-                          <span className="font-bold text-foreground text-xs">{BRL(deal.value)}</span>
+                      {/* Topo do Card: ETIQUETAS ESTILO TRELLO (Substituindo o #1789) */}
+                      <div className="flex items-start justify-between gap-1.5 mb-2">
+                        <div className="flex items-center gap-1 flex-wrap min-w-0 flex-1">
+                          {dealTags.map((tag) => (
+                            <span
+                              key={tag.id}
+                              style={{
+                                backgroundColor: `${tag.color}15`,
+                                color: tag.color,
+                                borderColor: `${tag.color}35`,
+                              }}
+                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase border shadow-2xs"
+                              title={tag.name}
+                            >
+                              <span
+                                className="w-1.5 h-1.5 rounded-full shrink-0"
+                                style={{ backgroundColor: tag.color }}
+                              />
+                              <span className="truncate max-w-[85px]">{tag.name}</span>
+                            </span>
+                          ))}
+
+                          {/* Seletor Rápido de Etiquetas */}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                type="button"
+                                className="h-4 px-1 rounded text-muted-foreground/60 hover:text-foreground hover:bg-muted border border-dashed border-border/80 text-[9px] flex items-center gap-0.5 transition-colors"
+                                title="Gerenciar etiquetas"
+                              >
+                                <Plus className="h-2.5 w-2.5" />
+                                {dealTags.length === 0 && <span>Etiqueta</span>}
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start" className="w-48 p-1.5">
+                              <div className="text-[10px] font-bold text-muted-foreground px-2 py-1 uppercase tracking-wider">
+                                Etiquetas
+                              </div>
+                              {tags.map((t) => {
+                                const isSelected = (deal.tag_ids || []).includes(t.id);
+                                return (
+                                  <DropdownMenuItem
+                                    key={t.id}
+                                    onClick={() => handleToggleDealTag(deal.id, t.id)}
+                                    className="flex items-center justify-between py-1.5 px-2 cursor-pointer text-xs"
+                                  >
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <span
+                                        className="w-2.5 h-2.5 rounded-full shrink-0"
+                                        style={{ backgroundColor: t.color }}
+                                      />
+                                      <span className="truncate">{t.name}</span>
+                                    </div>
+                                    {isSelected && <Check className="h-3.5 w-3.5 text-[#FF6B00]" />}
+                                  </DropdownMenuItem>
+                                );
+                              })}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => handleOpenCreateTagModal()}
+                                className="text-xs text-[#FF6B00] font-medium py-1.5"
+                              >
+                                <Plus className="h-3.5 w-3.5 mr-1.5" /> Criar nova etiqueta
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+
+                        {/* Menu de Ações do Card */}
+                        <div className="flex items-center gap-0.5 shrink-0">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button
@@ -933,24 +1175,28 @@ export function PipelinePage() {
                         </div>
                       </div>
 
-                      <h4
-                        onClick={() => handleOpenEditModal(deal)}
-                        className="text-xs font-semibold text-foreground hover:text-[#FF6B00] cursor-pointer truncate transition-colors"
-                      >
-                        {deal.title}
-                      </h4>
-                      <p className="text-[11px] text-muted-foreground truncate">
+                      {/* Título & Valor */}
+                      <div className="flex items-start justify-between gap-1.5">
+                        <h4
+                          onClick={() => handleOpenEditModal(deal)}
+                          className="text-xs font-semibold text-foreground hover:text-[#FF6B00] cursor-pointer truncate transition-colors flex-1"
+                        >
+                          {deal.title}
+                        </h4>
+                        <span className="font-bold text-foreground text-xs shrink-0">
+                          {BRL(deal.value)}
+                        </span>
+                      </div>
+
+                      <p className="text-[11px] text-muted-foreground truncate mt-0.5">
                         {deal.client_name} {deal.company_name ? `· ${deal.company_name}` : ""}
                       </p>
 
+                      {/* Rodapé Compacto com Contato & Avatar */}
                       <div className="mt-2 pt-1.5 border-t border-border/40 flex items-center justify-between">
-                        <span
-                          className={cn(
-                            "px-1.5 py-0.2 rounded text-[8px] font-bold tracking-wide uppercase",
-                            deal.tag_color
-                          )}
-                        >
-                          {deal.tag}
+                        <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                          <Calendar className="h-2.5 w-2.5" />
+                          {deal.activity_date}
                         </span>
 
                         <div className="flex items-center gap-1.5">
@@ -985,15 +1231,80 @@ export function PipelinePage() {
                         draggingDealId === deal.id && "opacity-50 scale-95"
                       )}
                     >
-                      {/* Topo do Card: Código e Menu */}
-                      <div className="flex items-center justify-between mb-1.5 text-xs text-muted-foreground">
-                        <span className="font-mono font-medium">{deal.code}</span>
+                      {/* Topo do Card: ETIQUETAS ESTILO TRELLO (Substituindo o #1789) */}
+                      <div className="flex items-start justify-between gap-1.5 mb-2.5">
+                        <div className="flex items-center gap-1.5 flex-wrap min-w-0 flex-1">
+                          {dealTags.map((tag) => (
+                            <span
+                              key={tag.id}
+                              style={{
+                                backgroundColor: `${tag.color}15`,
+                                color: tag.color,
+                                borderColor: `${tag.color}35`,
+                              }}
+                              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase border shadow-2xs transition-transform hover:scale-105"
+                              title={tag.name}
+                            >
+                              <span
+                                className="w-2 h-2 rounded-full shrink-0"
+                                style={{ backgroundColor: tag.color }}
+                              />
+                              <span className="truncate max-w-[120px]">{tag.name}</span>
+                            </span>
+                          ))}
+
+                          {/* Seletor Rápido de Etiquetas */}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                type="button"
+                                className="h-5 px-1.5 rounded-md text-muted-foreground/70 hover:text-foreground hover:bg-muted border border-dashed border-border/80 text-[10px] flex items-center gap-1 transition-colors"
+                                title="Adicionar ou alterar etiquetas"
+                              >
+                                <Tag className="h-2.5 w-2.5" />
+                                {dealTags.length === 0 && <span>+ Etiqueta</span>}
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start" className="w-52 p-1.5">
+                              <div className="text-[10px] font-bold text-muted-foreground px-2 py-1 uppercase tracking-wider">
+                                Etiquetas do Negócio
+                              </div>
+                              {tags.map((t) => {
+                                const isSelected = (deal.tag_ids || []).includes(t.id);
+                                return (
+                                  <DropdownMenuItem
+                                    key={t.id}
+                                    onClick={() => handleToggleDealTag(deal.id, t.id)}
+                                    className="flex items-center justify-between py-1.5 px-2 cursor-pointer text-xs"
+                                  >
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <span
+                                        className="w-2.5 h-2.5 rounded-full shrink-0"
+                                        style={{ backgroundColor: t.color }}
+                                      />
+                                      <span className="truncate">{t.name}</span>
+                                    </div>
+                                    {isSelected && <Check className="h-3.5 w-3.5 text-[#FF6B00]" />}
+                                  </DropdownMenuItem>
+                                );
+                              })}
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => handleOpenCreateTagModal()}
+                                className="text-xs text-[#FF6B00] font-medium py-1.5"
+                              >
+                                <Plus className="h-3.5 w-3.5 mr-1.5" /> Criar nova etiqueta
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-5 w-5 text-muted-foreground hover:text-foreground -mr-1"
+                              className="h-5 w-5 text-muted-foreground hover:text-foreground -mr-1 shrink-0"
                             >
                               <MoreVertical className="h-3.5 w-3.5" />
                             </Button>
@@ -1047,51 +1358,33 @@ export function PipelinePage() {
                             </span>
                           </div>
 
-                          {/* Avatar secundário decorativo se houver */}
-                          <Avatar className="h-4 w-4 opacity-80 ring-1 ring-border">
-                            <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80" />
-                            <AvatarFallback className="text-[8px]">F</AvatarFallback>
-                          </Avatar>
-                        </div>
-                      </div>
-
-                      {/* Tag e Ações Rápidas (Telefone / WhatsApp) */}
-                      <div className="mt-3 pt-2 border-t border-border/40 flex items-center justify-between">
-                        <span
-                          className={cn(
-                            "px-2 py-0.5 rounded text-[9px] font-bold tracking-wide uppercase",
-                            deal.tag_color
-                          )}
-                        >
-                          {deal.tag}
-                        </span>
-
-                        <div className="flex items-center gap-1">
-                          {deal.phone && (
-                            <a
-                              href={`tel:${deal.phone}`}
-                              className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors"
-                              title="Ligar"
-                            >
-                              <Phone className="h-3 w-3" />
-                            </a>
-                          )}
-                          {deal.whatsapp && (
-                            <a
-                              href={`https://wa.me/${deal.whatsapp.replace(/\D/g, "")}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="p-1 text-muted-foreground hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded transition-colors"
-                              title="WhatsApp"
-                            >
-                              <MessageSquare className="h-3 w-3" />
-                            </a>
-                          )}
+                          <div className="flex items-center gap-1">
+                            {deal.phone && (
+                              <a
+                                href={`tel:${deal.phone}`}
+                                className="p-1 text-muted-foreground hover:text-foreground hover:bg-muted rounded transition-colors"
+                                title="Ligar"
+                              >
+                                <Phone className="h-3 w-3" />
+                              </a>
+                            )}
+                            {deal.whatsapp && (
+                              <a
+                                href={`https://wa.me/${deal.whatsapp.replace(/\D/g, "")}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="p-1 text-muted-foreground hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded transition-colors"
+                                title="WhatsApp"
+                              >
+                                <MessageSquare className="h-3 w-3" />
+                              </a>
+                            )}
+                          </div>
                         </div>
                       </div>
 
                       {/* Rodapé: Próxima Atividade */}
-                      <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
+                      <div className="mt-3 pt-2 border-t border-border/40 flex items-center justify-between text-[11px] text-muted-foreground">
                         <span className="flex items-center gap-1 text-muted-foreground/80">
                           <Calendar className="h-3 w-3" />
                           {deal.activity_title}
@@ -1101,8 +1394,8 @@ export function PipelinePage() {
                         </span>
                       </div>
                     </div>
-                  )
-                )}
+                  );
+                })}
 
                 {/* Card Inline "Adicionar Negócio" */}
                 <button
@@ -1123,7 +1416,7 @@ export function PipelinePage() {
         {/* Botão para Criar Nova Coluna / Etapa no Final */}
         <button
           type="button"
-          onClick={() => handleOpenAddStageModal(stages.length)}
+          onClick={() => handleOpenAddStageModal()}
           className="flex flex-col items-center justify-center w-[240px] shrink-0 min-h-[140px] rounded-2xl border-2 border-dashed border-border/80 hover:border-[#FF6B00] bg-muted/20 hover:bg-card text-muted-foreground hover:text-[#FF6B00] gap-2 font-semibold text-xs transition-all cursor-pointer p-5 group"
         >
           <div className="h-9 w-9 rounded-full bg-[#FF6B00]/10 text-[#FF6B00] group-hover:bg-[#FF6B00] group-hover:text-white flex items-center justify-center transition-colors shadow-sm">
@@ -1133,44 +1426,31 @@ export function PipelinePage() {
         </button>
       </div>
 
-      {/* 4. Modal de Criação / Edição de Negócio */}
+      {/* 3. Modal de Criação / Edição de Negócio */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-display text-lg font-bold flex items-center gap-2">
               {editingDealId ? "Editar Negócio" : "Criar Novo Negócio"}
               <span className="text-xs font-normal text-muted-foreground">
-                (Relacionamentos & Funil)
+                (Funil & Relacionamentos)
               </span>
             </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleSaveDeal} className="space-y-4 pt-2">
-            {/* Título & Código */}
+            {/* Título & Valor */}
             <div className="grid grid-cols-3 gap-3">
               <div className="col-span-2 space-y-1.5">
                 <Label htmlFor="deal-title" className="text-xs">Título do Negócio *</Label>
                 <Input
                   id="deal-title"
-                  placeholder="Ex: Negócio #1789"
+                  placeholder="Ex: Consultoria Premium"
                   required
                   value={formTitle}
                   onChange={(e) => setFormTitle(e.target.value)}
                 />
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="deal-code" className="text-xs">Código</Label>
-                <Input
-                  id="deal-code"
-                  placeholder="#1789"
-                  value={formCode}
-                  onChange={(e) => setFormCode(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* Valor e Etapa */}
-            <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="deal-val" className="text-xs">Valor (R$)</Label>
                 <Input
@@ -1181,7 +1461,10 @@ export function PipelinePage() {
                   onChange={(e) => setFormValue(e.target.value)}
                 />
               </div>
+            </div>
 
+            {/* Etapa e Responsável */}
+            <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs">Etapa do Funil</Label>
                 <Select value={modalStageId} onValueChange={setModalStageId}>
@@ -1196,6 +1479,78 @@ export function PipelinePage() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs">Responsável</Label>
+                <Select value={formResponsibleId} onValueChange={setFormResponsibleId}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TEAM_MEMBERS.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>
+                        {m.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Seção de ETIQUETAS RELACIONAIS ESTILO TRELLO */}
+            <div className="p-3 bg-muted/30 rounded-xl border border-border/70 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                  <Tag className="h-3.5 w-3.5 text-[#FF6B00]" />
+                  Etiquetas do Negócio (Trello Style)
+                </Label>
+                <button
+                  type="button"
+                  onClick={() => handleOpenCreateTagModal()}
+                  className="text-xs text-[#FF6B00] hover:underline flex items-center gap-1 font-medium cursor-pointer"
+                >
+                  <Plus className="h-3 w-3" /> Nova Etiqueta
+                </button>
+              </div>
+
+              {/* Badges de Tags Clicáveis / Alternáveis */}
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {tags.map((t) => {
+                  const isSelected = formTagIds.includes(t.id);
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => {
+                        if (isSelected) {
+                          setFormTagIds(formTagIds.filter((id) => id !== t.id));
+                        } else {
+                          setFormTagIds([...formTagIds, t.id]);
+                        }
+                      }}
+                      style={{
+                        backgroundColor: isSelected ? t.color : `${t.color}15`,
+                        color: isSelected ? "#FFFFFF" : t.color,
+                        borderColor: isSelected ? t.color : `${t.color}40`,
+                      }}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold uppercase border transition-all cursor-pointer shadow-2xs",
+                        isSelected ? "scale-105 shadow-xs" : "hover:opacity-80"
+                      )}
+                    >
+                      {isSelected ? (
+                        <Check className="h-3 w-3 stroke-[3]" />
+                      ) : (
+                        <span
+                          className="w-2 h-2 rounded-full shrink-0"
+                          style={{ backgroundColor: t.color }}
+                        />
+                      )}
+                      <span>{t.name}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -1275,45 +1630,6 @@ export function PipelinePage() {
               </div>
             </div>
 
-            {/* Responsável & Tag */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label className="text-xs">Responsável pela Conta</Label>
-                <Select value={formResponsibleId} onValueChange={setFormResponsibleId}>
-                  <SelectTrigger className="h-9">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {TEAM_MEMBERS.map((m) => (
-                      <SelectItem key={m.id} value={m.id}>
-                        {m.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label className="text-xs">Tag do Negócio</Label>
-                <Select value={formTag} onValueChange={setFormTag}>
-                  <SelectTrigger className="h-9">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="PROPOSTA">PROPOSTA</SelectItem>
-                    <SelectItem value="CONTATO">CONTATO</SelectItem>
-                    <SelectItem value="DOCUMENTOS">DOCUMENTOS</SelectItem>
-                    <SelectItem value="NEGOCIAÇÃO">NEGOCIAÇÃO</SelectItem>
-                    <SelectItem value="ANÁLISE">ANÁLISE</SelectItem>
-                    <SelectItem value="CONTRATO">CONTRATO</SelectItem>
-                    <SelectItem value="FATURA">FATURA</SelectItem>
-                    <SelectItem value="EM ANDAMENTO">EM ANDAMENTO</SelectItem>
-                    <SelectItem value="ENTREGA">ENTREGA</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
             {/* Próxima Atividade */}
             <div className="space-y-1.5">
               <Label htmlFor="activity-date" className="text-xs">Data da Próxima Atividade</Label>
@@ -1325,7 +1641,7 @@ export function PipelinePage() {
               />
             </div>
 
-            {/* Notas / Observações */}
+            {/* Observações */}
             <div className="space-y-1.5">
               <Label htmlFor="notes" className="text-xs">Observações do Negócio</Label>
               <Textarea
@@ -1351,6 +1667,148 @@ export function PipelinePage() {
               >
                 {editingDealId ? "Salvar Alterações" : "Criar Negócio"}
               </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* 4. Modal de Criação / Edição / Gerenciamento de Etiquetas (Tags) */}
+      <Dialog open={isTagModalOpen} onOpenChange={setIsTagModalOpen}>
+        <DialogContent className="sm:max-w-[440px]">
+          <DialogHeader>
+            <DialogTitle className="font-display text-base font-bold flex items-center gap-2">
+              <Tag className="h-4 w-4 text-[#FF6B00]" />
+              {editingTagId ? "Editar Etiqueta" : "Nova Etiqueta (Trello Style)"}
+            </DialogTitle>
+          </DialogHeader>
+
+          <form onSubmit={handleSaveTag} className="space-y-4 pt-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="tag-name" className="text-xs">Nome da Etiqueta *</Label>
+              <Input
+                id="tag-name"
+                placeholder="Ex: URGENTE, VIP, PROPOSTA"
+                required
+                value={tagName}
+                onChange={(e) => setTagName(e.target.value)}
+              />
+            </div>
+
+            {/* Paleta de Cores */}
+            <div className="space-y-2">
+              <Label className="text-xs">Cor da Etiqueta</Label>
+              <div className="grid grid-cols-5 gap-2">
+                {TAG_PALETTE.map((c) => (
+                  <button
+                    key={c.value}
+                    type="button"
+                    onClick={() => setTagColor(c.value)}
+                    className={cn(
+                      "flex items-center justify-center h-8 rounded-lg border text-[11px] font-bold text-white transition-all cursor-pointer",
+                      tagColor === c.value ? "ring-2 ring-foreground scale-105" : "opacity-80 hover:opacity-100"
+                    )}
+                    style={{ backgroundColor: c.value }}
+                    title={c.label}
+                  >
+                    {tagColor === c.value && "✓"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Preview da Etiqueta */}
+            <div className="space-y-1.5 pt-1">
+              <Label className="text-[11px] text-muted-foreground">Pré-visualização no Card:</Label>
+              <div className="p-3 bg-muted/40 rounded-lg flex items-center justify-center border border-border/60">
+                <span
+                  style={{
+                    backgroundColor: `${tagColor}15`,
+                    color: tagColor,
+                    borderColor: `${tagColor}40`,
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-bold uppercase border shadow-2xs"
+                >
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: tagColor }} />
+                  <span>{tagName.trim() || "NOME DA ETIQUETA"}</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Lista de Etiquetas Existentes para Gerenciamento */}
+            <div className="space-y-1.5 pt-1">
+              <Label className="text-[11px] text-muted-foreground">Etiquetas Existentes:</Label>
+              <div className="max-h-32 overflow-y-auto space-y-1.5 pr-1">
+                {tags.map((t) => (
+                  <div
+                    key={t.id}
+                    className="flex items-center justify-between p-1.5 rounded-md bg-card border border-border/60 text-xs"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: t.color }} />
+                      <span className="font-semibold truncate">{t.name}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          setEditingTagId(t.id);
+                          setTagName(t.name);
+                          setTagColor(t.color);
+                        }}
+                        className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                      >
+                        <Edit2 className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeleteTag(t.id)}
+                        className="h-6 w-6 text-destructive hover:bg-destructive/10"
+                        disabled={tags.length <= 1}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <DialogFooter className="pt-2 flex justify-between items-center sm:justify-between">
+              {editingTagId && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    handleDeleteTag(editingTagId);
+                    setIsTagModalOpen(false);
+                  }}
+                  className="text-destructive hover:bg-destructive/10 text-xs"
+                  disabled={tags.length <= 1}
+                >
+                  <Trash2 className="h-3.5 w-3.5 mr-1" /> Excluir
+                </Button>
+              )}
+              <div className="flex gap-2 ml-auto">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsTagModalOpen(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="bg-[#FF6B00] hover:bg-[#E65C00] text-white"
+                >
+                  {editingTagId ? "Salvar Etiqueta" : "Criar Etiqueta"}
+                </Button>
+              </div>
             </DialogFooter>
           </form>
         </DialogContent>
