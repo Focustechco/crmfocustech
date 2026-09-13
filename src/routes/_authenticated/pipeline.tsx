@@ -45,12 +45,16 @@ function PipelinePage() {
   const { data: stages = [] } = useQuery({
     queryKey: ["stages"],
     queryFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
       const { data, error } = await supabase
         .from("pipeline_stages")
         .select("*")
+        .eq("user_id", u.user!.id)
         .order("position");
       if (error) throw error;
-      return data;
+      // Deduplicate by name (legacy seed races)
+      const seen = new Set<string>();
+      return (data ?? []).filter((s) => (seen.has(s.name) ? false : (seen.add(s.name), true)));
     },
   });
 
