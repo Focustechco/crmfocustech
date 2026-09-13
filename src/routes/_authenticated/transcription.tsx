@@ -664,24 +664,26 @@ function TranscriptionPage() {
       </div>
 
       {/* Barra de Filtros por Categoria de Modelo */}
-      <Card className="p-3 bg-card border-border/80 shadow-xs">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+      <Card className="p-2 sm:p-2.5 bg-card border-border/80 shadow-xs">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
+          <div className="flex items-center gap-1 bg-muted/60 p-0.5 rounded-lg overflow-x-auto no-scrollbar shrink-0">
             {[
-              { id: "all", label: "Todas as Reuniões" },
-              { id: "diagnostico", label: "🔍 Diagnóstico" },
-              { id: "proposta", label: "📑 Apresentação de Proposta" },
-              { id: "fechamento", label: "🏆 Fechamento" },
-              { id: "followup", label: "🔄 Follow-up" },
-              { id: "parceria", label: "🤝 Parceria" },
+              { id: "all", label: "Todas" },
+              { id: "diagnostico", label: "Diagnóstico" },
+              { id: "proposta", label: "Proposta" },
+              { id: "fechamento", label: "Fechamento" },
+              { id: "followup", label: "Follow-up" },
+              { id: "parceria", label: "Parceria" },
             ].map((tab) => (
               <Button
                 key={tab.id}
-                variant={typeFilter === tab.id ? "default" : "outline"}
+                variant={typeFilter === tab.id ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setTypeFilter(tab.id)}
-                className={`text-xs h-8 cursor-pointer shrink-0 ${
-                  typeFilter === tab.id ? "bg-primary text-white" : ""
+                className={`text-xs h-7.5 px-2.5 cursor-pointer font-medium shrink-0 ${
+                  typeFilter === tab.id
+                    ? "bg-[#FF6B00] text-white shadow-xs font-semibold"
+                    : "text-foreground hover:text-foreground"
                 }`}
               >
                 {tab.label}
@@ -689,11 +691,11 @@ function TranscriptionPage() {
             ))}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 shrink-0 justify-between sm:justify-end w-full lg:w-auto">
             <Select value={consultantFilter} onValueChange={setConsultantFilter}>
-              <SelectTrigger className="h-8 text-xs w-[170px] bg-background">
-                <Users className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
-                <SelectValue placeholder="Todos os Consultores" />
+              <SelectTrigger className="h-7.5 text-xs w-[140px] sm:w-[160px] bg-background px-2">
+                <Users className="h-3.5 w-3.5 mr-1 text-muted-foreground shrink-0" />
+                <SelectValue placeholder="Toda a Equipe" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Toda a Equipe</SelectItem>
@@ -708,7 +710,7 @@ function TranscriptionPage() {
             <Button
               onClick={() => setIsUploadModalOpen(true)}
               size="sm"
-              className="md:hidden brand-gradient text-white h-8 text-xs font-semibold cursor-pointer"
+              className="lg:hidden brand-gradient text-white h-7.5 text-xs px-2.5 font-semibold cursor-pointer shrink-0"
             >
               <Plus className="h-3.5 w-3.5 mr-1" />
               + Transcrição

@@ -281,26 +281,36 @@ export function SettingsPage() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="bg-muted/60 p-1 border flex-wrap h-auto">
-          <TabsTrigger value="profile" className="gap-2 data-[state=active]:bg-background">
-            <User className="h-4 w-4 text-[#FF6B00]" />
-            <span>Perfil & Conta</span>
+        <TabsList className="bg-muted/60 p-0.5 border overflow-x-auto max-w-full justify-start sm:justify-center flex-nowrap shrink-0">
+          <TabsTrigger
+            value="profile"
+            className="text-xs h-7.5 px-3 shrink-0 cursor-pointer font-medium text-foreground hover:text-foreground data-[state=active]:bg-[#FF6B00] data-[state=active]:text-white data-[state=active]:shadow-xs data-[state=active]:font-semibold"
+          >
+            Perfil & Conta
           </TabsTrigger>
-          <TabsTrigger value="notifications" className="gap-2 data-[state=active]:bg-background">
-            <Bell className="h-4 w-4 text-blue-500" />
-            <span>Notificações</span>
+          <TabsTrigger
+            value="notifications"
+            className="text-xs h-7.5 px-3 shrink-0 cursor-pointer font-medium text-foreground hover:text-foreground data-[state=active]:bg-[#FF6B00] data-[state=active]:text-white data-[state=active]:shadow-xs data-[state=active]:font-semibold"
+          >
+            Notificações
           </TabsTrigger>
-          <TabsTrigger value="team" className="gap-2 data-[state=active]:bg-background">
-            <Users className="h-4 w-4 text-emerald-500" />
-            <span>Equipe ({teamList.length})</span>
+          <TabsTrigger
+            value="team"
+            className="text-xs h-7.5 px-3 shrink-0 cursor-pointer font-medium text-foreground hover:text-foreground data-[state=active]:bg-[#FF6B00] data-[state=active]:text-white data-[state=active]:shadow-xs data-[state=active]:font-semibold"
+          >
+            Equipe
           </TabsTrigger>
-          <TabsTrigger value="integrations" className="gap-2 data-[state=active]:bg-background">
-            <Webhook className="h-4 w-4 text-purple-500" />
-            <span>Integrações & API</span>
+          <TabsTrigger
+            value="integrations"
+            className="text-xs h-7.5 px-3 shrink-0 cursor-pointer font-medium text-foreground hover:text-foreground data-[state=active]:bg-[#FF6B00] data-[state=active]:text-white data-[state=active]:shadow-xs data-[state=active]:font-semibold"
+          >
+            Integrações & API
           </TabsTrigger>
-          <TabsTrigger value="organization" className="gap-2 data-[state=active]:bg-background">
-            <Shield className="h-4 w-4 text-amber-500" />
-            <span>Empresa & Sistema</span>
+          <TabsTrigger
+            value="organization"
+            className="text-xs h-7.5 px-3 shrink-0 cursor-pointer font-medium text-foreground hover:text-foreground data-[state=active]:bg-[#FF6B00] data-[state=active]:text-white data-[state=active]:shadow-xs data-[state=active]:font-semibold"
+          >
+            Empresa & Sistema
           </TabsTrigger>
         </TabsList>
 

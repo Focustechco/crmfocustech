@@ -593,54 +593,58 @@ function ProspeccaoPage() {
       </div>
 
       {/* Navegação de Abas do Módulo */}
-      <Card className="p-3 bg-card border-border/80 shadow-xs">
-        <div className="flex items-center gap-1.5 bg-muted/60 p-1 rounded-lg self-start flex-wrap">
+      <Card className="p-2 sm:p-2.5 bg-card border-border/80 shadow-xs">
+        <div className="flex items-center gap-1 bg-muted/60 p-0.5 rounded-lg overflow-x-auto no-scrollbar shrink-0 w-full sm:w-auto">
           <Button
             variant={activeTab === "sdr" ? "default" : "ghost"}
             size="sm"
             onClick={() => setActiveTab("sdr")}
-            className={`text-xs h-8 cursor-pointer ${
-              activeTab === "sdr" ? "bg-primary text-white shadow-xs font-semibold" : ""
+            className={`text-xs h-7.5 px-2.5 cursor-pointer font-medium ${
+              activeTab === "sdr"
+                ? "bg-[#FF6B00] text-white shadow-xs font-semibold"
+                : "text-foreground hover:text-foreground"
             }`}
           >
-            <UserCheck className="h-3.5 w-3.5 mr-1.5" />
-            SDR Hub (Central de Pré-Vendas)
+            SDR Hub
           </Button>
 
           <Button
             variant={activeTab === "scripts" ? "default" : "ghost"}
             size="sm"
             onClick={() => setActiveTab("scripts")}
-            className={`text-xs h-8 cursor-pointer ${
-              activeTab === "scripts" ? "bg-primary text-white shadow-xs font-semibold" : ""
+            className={`text-xs h-7.5 px-2.5 cursor-pointer font-medium ${
+              activeTab === "scripts"
+                ? "bg-[#FF6B00] text-white shadow-xs font-semibold"
+                : "text-foreground hover:text-foreground"
             }`}
           >
-            <MessageCircle className="h-3.5 w-3.5 mr-1.5" />
-            Playbook de Scripts & Objeções ({scripts.length})
+            Playbook
           </Button>
 
           <Button
             variant={activeTab === "presentation" ? "default" : "ghost"}
             size="sm"
             onClick={() => setActiveTab("presentation")}
-            className={`text-xs h-8 cursor-pointer ${
-              activeTab === "presentation" ? "bg-primary text-white shadow-xs font-semibold" : ""
+            className={`text-xs h-7.5 px-2.5 cursor-pointer font-medium ${
+              activeTab === "presentation"
+                ? "bg-[#FF6B00] text-white shadow-xs font-semibold"
+                : "text-foreground hover:text-foreground"
             }`}
           >
-            <Presentation className="h-3.5 w-3.5 mr-1.5" />
-            Apresentação Comercial & Pitch Deck
+            Pitch Comercial
           </Button>
 
           <Button
             variant={activeTab === "vault" ? "default" : "ghost"}
             size="sm"
             onClick={() => setActiveTab("vault")}
-            className={`text-xs h-8 cursor-pointer ${
-              activeTab === "vault" ? "bg-primary text-white shadow-xs font-semibold" : ""
+            className={`text-xs h-7.5 px-2.5 cursor-pointer font-medium ${
+              activeTab === "vault"
+                ? "bg-[#FF6B00] text-white shadow-xs font-semibold"
+                : "text-foreground hover:text-foreground"
             }`}
           >
-            <FileSpreadsheet className="h-3.5 w-3.5 mr-1.5" />
-            Documentos, Planilhas & Links ({resources.length})
+            Documentos
           </Button>
         </div>
       </Card>

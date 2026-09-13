@@ -1134,34 +1134,30 @@ export function TasksAndAgendaPage() {
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-3">
-          <TabsList className="bg-muted/60 p-1 border overflow-x-auto max-w-full justify-start sm:justify-center flex-nowrap shrink-0">
-            <TabsTrigger value="agenda" className="gap-1.5 sm:gap-2 data-[state=active]:bg-background text-xs shrink-0 cursor-pointer">
-              <CalendarDays className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#FF6B00]" />
-              <span>Agenda & Reuniões</span>
-              <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0">
-                {meetings.length}
-              </Badge>
+          <TabsList className="bg-muted/60 p-0.5 border overflow-x-auto max-w-full justify-start sm:justify-center flex-nowrap shrink-0">
+            <TabsTrigger
+              value="agenda"
+              className="text-xs h-7.5 px-3 shrink-0 cursor-pointer font-medium text-foreground hover:text-foreground data-[state=active]:bg-[#FF6B00] data-[state=active]:text-white data-[state=active]:shadow-xs data-[state=active]:font-semibold"
+            >
+              Agenda & Reuniões
             </TabsTrigger>
-            <TabsTrigger value="calendar" className="gap-1.5 sm:gap-2 data-[state=active]:bg-background text-xs shrink-0 cursor-pointer">
-              <CalendarIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-500" />
-              <span>Calendário</span>
-              <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0">
-                {meetings.length + tasks.filter((t) => t.status !== "done").length}
-              </Badge>
+            <TabsTrigger
+              value="calendar"
+              className="text-xs h-7.5 px-3 shrink-0 cursor-pointer font-medium text-foreground hover:text-foreground data-[state=active]:bg-[#FF6B00] data-[state=active]:text-white data-[state=active]:shadow-xs data-[state=active]:font-semibold"
+            >
+              Calendário
             </TabsTrigger>
-            <TabsTrigger value="checklist" className="gap-1.5 sm:gap-2 data-[state=active]:bg-background text-xs shrink-0 cursor-pointer">
-              <CheckSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-500" />
-              <span>Checklist</span>
-              <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0">
-                {tasks.filter((t) => t.status !== "done").length}
-              </Badge>
+            <TabsTrigger
+              value="checklist"
+              className="text-xs h-7.5 px-3 shrink-0 cursor-pointer font-medium text-foreground hover:text-foreground data-[state=active]:bg-[#FF6B00] data-[state=active]:text-white data-[state=active]:shadow-xs data-[state=active]:font-semibold"
+            >
+              Checklist
             </TabsTrigger>
-            <TabsTrigger value="goals" className="gap-1.5 sm:gap-2 data-[state=active]:bg-background text-xs shrink-0 cursor-pointer">
-              <Target className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500" />
-              <span>Metas & OKRs</span>
-              <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0">
-                {goals.length}
-              </Badge>
+            <TabsTrigger
+              value="goals"
+              className="text-xs h-7.5 px-3 shrink-0 cursor-pointer font-medium text-foreground hover:text-foreground data-[state=active]:bg-[#FF6B00] data-[state=active]:text-white data-[state=active]:shadow-xs data-[state=active]:font-semibold"
+            >
+              Metas & OKRs
             </TabsTrigger>
           </TabsList>
         </div>

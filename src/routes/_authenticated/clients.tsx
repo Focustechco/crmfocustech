@@ -749,10 +749,11 @@ function ComercialOSPage() {
               size="sm"
               onClick={() => setActiveTab("ranking")}
               className={`text-xs h-7.5 px-2.5 cursor-pointer font-medium ${
-                activeTab === "ranking" ? "bg-primary text-white shadow-xs font-semibold" : ""
+                activeTab === "ranking"
+                  ? "bg-[#FF6B00] text-white shadow-xs font-semibold"
+                  : "text-foreground hover:text-foreground"
               }`}
             >
-              <Award className="h-3.5 w-3.5 mr-1" />
               Ranking
             </Button>
             <Button
@@ -760,10 +761,11 @@ function ComercialOSPage() {
               size="sm"
               onClick={() => setActiveTab("activities")}
               className={`text-xs h-7.5 px-2.5 cursor-pointer font-medium ${
-                activeTab === "activities" ? "bg-primary text-white shadow-xs font-semibold" : ""
+                activeTab === "activities"
+                  ? "bg-[#FF6B00] text-white shadow-xs font-semibold"
+                  : "text-foreground hover:text-foreground"
               }`}
             >
-              <Activity className="h-3.5 w-3.5 mr-1" />
               Atividades
             </Button>
             <Button
@@ -771,10 +773,11 @@ function ComercialOSPage() {
               size="sm"
               onClick={() => setActiveTab("charts")}
               className={`text-xs h-7.5 px-2.5 cursor-pointer font-medium ${
-                activeTab === "charts" ? "bg-primary text-white shadow-xs font-semibold" : ""
+                activeTab === "charts"
+                  ? "bg-[#FF6B00] text-white shadow-xs font-semibold"
+                  : "text-foreground hover:text-foreground"
               }`}
             >
-              <Target className="h-3.5 w-3.5 mr-1" />
               Produtividade
             </Button>
             <Button
@@ -782,10 +785,11 @@ function ComercialOSPage() {
               size="sm"
               onClick={() => setActiveTab("deals")}
               className={`text-xs h-7.5 px-2.5 cursor-pointer font-medium ${
-                activeTab === "deals" ? "bg-primary text-white shadow-xs font-semibold" : ""
+                activeTab === "deals"
+                  ? "bg-[#FF6B00] text-white shadow-xs font-semibold"
+                  : "text-foreground hover:text-foreground"
               }`}
             >
-              <FileCheck className="h-3.5 w-3.5 mr-1" />
               Contratos
             </Button>
           </div>
