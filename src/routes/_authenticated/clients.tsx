@@ -50,7 +50,7 @@ function ClientsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
+      <div className="hidden md:block">
         <h1 className="font-display text-2xl font-bold tracking-tight">Clientes</h1>
         <p className="text-sm text-muted-foreground">Sua base de clientes ativos.</p>
       </div>

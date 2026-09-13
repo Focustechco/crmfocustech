@@ -876,7 +876,7 @@ export function PipelinePage() {
     <div className="flex flex-col gap-3.5 min-h-[calc(100vh-5rem)]">
       {/* 1. Header com Título e Filtros */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
+        <div className="hidden md:block">
           <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground">
             Funil de Leads
           </h1>

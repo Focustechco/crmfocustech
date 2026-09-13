@@ -98,16 +98,17 @@ function LeadsPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
+        <div className="hidden md:block">
           <h1 className="font-display text-2xl font-bold tracking-tight">Leads</h1>
           <p className="text-sm text-muted-foreground">Gerencie seus leads e oportunidades.</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button className="brand-gradient text-white hover:opacity-90">
-              <Plus className="mr-2 h-4 w-4" /> Novo Lead
-            </Button>
-          </DialogTrigger>
+        <div className="ml-auto md:ml-0">
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="brand-gradient text-white hover:opacity-90">
+                <Plus className="mr-2 h-4 w-4" /> Novo Lead
+              </Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Novo Lead</DialogTitle>
@@ -144,6 +145,7 @@ function LeadsPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <Card className="shadow-card">

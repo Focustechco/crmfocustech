@@ -127,18 +127,19 @@ function TasksPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
+        <div className="hidden md:block">
           <h1 className="font-display text-2xl font-bold tracking-tight">Tarefas</h1>
           <p className="text-sm text-muted-foreground">
             Organize seu dia no estilo ClickUp — board, lista e prioridades.
           </p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button className="brand-gradient text-white hover:opacity-90">
-              <Plus className="mr-2 h-4 w-4" /> Nova tarefa
-            </Button>
-          </DialogTrigger>
+        <div className="ml-auto md:ml-0">
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="brand-gradient text-white hover:opacity-90">
+                <Plus className="mr-2 h-4 w-4" /> Nova tarefa
+              </Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Nova tarefa</DialogTitle>
@@ -210,6 +211,7 @@ function TasksPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       <Tabs value={view} onValueChange={setView}>
