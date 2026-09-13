@@ -49,7 +49,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/pipeline")({
-  head: () => ({ meta: [{ title: "Negócios & Pipeline · Focus CRM" }] }),
+  head: () => ({ meta: [{ title: "Funil de Leads · Focus CRM" }] }),
   component: PipelinePage,
 });
 
@@ -704,10 +704,10 @@ export function PipelinePage() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="font-display text-2xl md:text-3xl font-bold tracking-tight text-foreground">
-            Negócios
+            Funil de Leads
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Acompanhe seu pipeline e nunca perca uma oportunidade.
+            Acompanhe seu funil de leads e nunca perca uma oportunidade.
           </p>
         </div>
 
