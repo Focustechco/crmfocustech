@@ -7,7 +7,7 @@ import {
   CheckSquare,
   MessageCircle,
   Mail,
-  Wallet,
+  Compass,
   CreditCard,
   BarChart3,
   Boxes,
@@ -33,7 +33,7 @@ const mainItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Leads", url: "/leads", icon: Users },
   { title: "Pipeline", url: "/pipeline", icon: KanbanSquare },
-  { title: "Negócios", url: "/deals", icon: Wallet },
+  { title: "Prospecção", url: "/deals", icon: Compass },
   { title: "Tarefas", url: "/tasks", icon: CheckSquare },
   { title: "Comercial OS", url: "/clients", icon: Target },
 ];

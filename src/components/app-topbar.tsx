@@ -19,7 +19,7 @@ const getModuleTitle = (path: string) => {
   if (path === "/dashboard" || path === "/") return "Dashboard";
   if (path.startsWith("/pipeline")) return "Funil de Leads";
   if (path.startsWith("/leads")) return "Leads";
-  if (path.startsWith("/deals")) return "Negócios";
+  if (path.startsWith("/deals")) return "Prospecção";
   if (path.startsWith("/clients")) return "Comercial OS";
   if (path.startsWith("/tasks")) return "Tarefas";
   if (path.startsWith("/settings")) return "Configurações";
