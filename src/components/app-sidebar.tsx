@@ -54,8 +54,8 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader className="border-b">
-        <div className={cn("flex h-16 items-center transition-all duration-200", collapsed ? "justify-center px-0" : "justify-start px-3")}>
+      <SidebarHeader className="border-b h-14 p-0 justify-center">
+        <div className={cn("flex h-14 items-center transition-all duration-200", collapsed ? "justify-center px-0" : "justify-start px-3")}>
           <FocusLogo showText={!collapsed} size={collapsed ? "sm" : "md"} />
         </div>
       </SidebarHeader>
