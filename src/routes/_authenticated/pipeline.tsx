@@ -713,35 +713,35 @@ export function PipelinePage() {
 
         {/* Filtros, Alternador de Visualização e Botão Novo Negócio */}
         <div className="flex flex-wrap items-center gap-2.5">
-          {/* Alternador de Visualização: Detalhado vs Resumido */}
+          {/* Alternador de Visualização: Ícones Apenas (Detalhado vs Resumido) */}
           <div className="flex items-center bg-muted/60 p-0.5 rounded-lg border border-border/80">
             <button
               type="button"
               onClick={() => handleSetCardViewMode("detailed")}
               className={cn(
-                "h-7 px-2.5 text-xs font-medium rounded-md flex items-center gap-1.5 transition-all cursor-pointer",
+                "h-8 w-8 text-xs font-medium rounded-md flex items-center justify-center transition-all cursor-pointer",
                 cardViewMode === "detailed"
                   ? "bg-background text-foreground shadow-xs"
                   : "text-muted-foreground hover:text-foreground"
               )}
               title="Visualização Detalhada"
+              aria-label="Visualização Detalhada"
             >
-              <LayoutGrid className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Detalhado</span>
+              <LayoutGrid className="h-4 w-4" />
             </button>
             <button
               type="button"
               onClick={() => handleSetCardViewMode("compact")}
               className={cn(
-                "h-7 px-2.5 text-xs font-medium rounded-md flex items-center gap-1.5 transition-all cursor-pointer",
+                "h-8 w-8 text-xs font-medium rounded-md flex items-center justify-center transition-all cursor-pointer",
                 cardViewMode === "compact"
                   ? "bg-background text-foreground shadow-xs"
                   : "text-muted-foreground hover:text-foreground"
               )}
-              title="Visualização Resumida (Compacta)"
+              title="Visualização Resumida"
+              aria-label="Visualização Resumida"
             >
-              <Rows3 className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Resumido</span>
+              <Rows3 className="h-4 w-4" />
             </button>
           </div>
 
@@ -810,13 +810,10 @@ export function PipelinePage() {
 
       {/* Colunas Kanban */}
       <div className="flex gap-4 overflow-x-auto pb-6 pt-1 items-start flex-1">
-        {stages.map((stage, idx) => {
+        {stages.map((stage) => {
           const stat = stageStats.get(stage.id) || { count: 0, totalValue: 0 };
           const stageDeals = filteredDeals.filter((d) => d.stage_id === stage.id);
           const isDragOver = dragOverStageId === stage.id;
-          const avgTicket = stat.count > 0 ? Math.round(stat.totalValue / stat.count) : 0;
-          const percentOfPipeline = totalPipelineValue > 0 ? Math.round((stat.totalValue / totalPipelineValue) * 100) : 0;
-          const defaultProbability = Math.min(100, Math.max(15, (idx + 1) * 18));
 
           return (
             <div
@@ -825,105 +822,69 @@ export function PipelinePage() {
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, stage.id)}
               className={cn(
-                "flex flex-col w-[310px] shrink-0 rounded-2xl bg-muted/30 border border-border/60 p-2.5 transition-colors min-h-[520px]",
+                "flex flex-col w-[310px] shrink-0 rounded-2xl bg-muted/30 border border-border/60 p-3 transition-colors min-h-[500px]",
                 isDragOver && "bg-primary/5 border-primary/40 ring-2 ring-primary/20"
               )}
             >
-              {/* Header da Coluna Detalhado */}
-              <div className="rounded-xl bg-card border border-border/80 p-3 mb-2.5 shadow-2xs flex flex-col gap-2 transition-all hover:border-border">
-                {/* Linha 1: Indicador de Cor, Nome da Etapa, Badge e Ações */}
-                <div className="flex items-center justify-between gap-1.5">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span
-                      className="w-2.5 h-2.5 rounded-full shrink-0 ring-2 ring-background shadow-2xs"
-                      style={{ backgroundColor: stage.color || "#FF6B00" }}
-                    />
-                    <h3 className="text-xs font-bold text-foreground truncate" title={stage.name}>
-                      {stage.name}
+              {/* Header da Coluna Clean */}
+              <div className="flex items-start justify-between mb-3 px-1">
+                <div className="flex items-start gap-2 min-w-0">
+                  <div
+                    className="w-1.5 h-7 rounded-full shrink-0 mt-0.5"
+                    style={{ backgroundColor: stage.color || "#FF6B00" }}
+                  />
+                  <div className="min-w-0">
+                    <h3 className="text-xs font-bold text-foreground flex items-center gap-1 truncate">
+                      <span>{stage.name}</span>
+                      <span className="text-muted-foreground font-normal text-[11px] shrink-0">
+                        ({stat.count})
+                      </span>
                     </h3>
-                    <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-muted text-muted-foreground border border-border/40 shrink-0">
-                      {stat.count}
-                    </span>
-                  </div>
-
-                  {/* Botões de Ação na Coluna */}
-                  <div className="flex items-center gap-0.5 shrink-0">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleOpenCreateModal(stage.id)}
-                      className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md"
-                      title="Adicionar negócio nesta fase"
-                    >
-                      <Plus className="h-3.5 w-3.5" />
-                    </Button>
-
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md"
-                          title="Opções da coluna"
-                        >
-                          <Settings2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem onClick={() => handleOpenEditStageModal(stage)}>
-                          <Edit2 className="h-3.5 w-3.5 mr-2" /> Editar coluna
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleOpenAddStageModal(stage.position + 1)}>
-                          <Plus className="h-3.5 w-3.5 mr-2" /> Inserir coluna
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDeleteStage(stage.id)}
-                          className="text-destructive focus:text-destructive"
-                          disabled={stages.length <= 1}
-                        >
-                          <Trash2 className="h-3.5 w-3.5 mr-2" /> Excluir coluna
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-
-                {/* Linha 2: Métricas Financeiras (Total & Ticket Médio) */}
-                <div className="flex items-baseline justify-between pt-1.5 border-t border-border/40 text-xs">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] uppercase font-semibold tracking-wider text-muted-foreground">
-                      Volume Total
-                    </span>
-                    <span className="text-xs font-bold text-[#FF6B00]">
+                    <p className="text-xs font-bold text-[#FF6B00]">
                       {BRL(stat.totalValue)}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col text-right">
-                    <span className="text-[10px] uppercase font-semibold tracking-wider text-muted-foreground">
-                      Ticket Médio
-                    </span>
-                    <span className="text-xs font-medium text-foreground/80">
-                      {BRL(avgTicket)}
-                    </span>
+                    </p>
                   </div>
                 </div>
 
-                {/* Linha 3: Mini Barra de Progresso & Participação no Pipeline */}
-                <div className="flex flex-col gap-1 pt-0.5">
-                  <div className="flex items-center justify-between text-[10px] text-muted-foreground font-medium">
-                    <span>{percentOfPipeline}% do funil</span>
-                    <span className="text-[10px] text-muted-foreground/80">Prob. {defaultProbability}%</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-muted/70 rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-300"
-                      style={{
-                        width: `${Math.max(percentOfPipeline, stat.count > 0 ? 8 : 0)}%`,
-                        backgroundColor: stage.color || "#FF6B00",
-                      }}
-                    />
-                  </div>
+                {/* Botões de Ação na Coluna */}
+                <div className="flex items-center gap-0.5 shrink-0">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleOpenCreateModal(stage.id)}
+                    className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-background rounded-full"
+                    title="Adicionar negócio nesta fase"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                  </Button>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-background rounded-full"
+                        title="Opções da coluna"
+                      >
+                        <Settings2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem onClick={() => handleOpenEditStageModal(stage)}>
+                        <Edit2 className="h-3.5 w-3.5 mr-2" /> Editar coluna
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleOpenAddStageModal(stage.position + 1)}>
+                        <Plus className="h-3.5 w-3.5 mr-2" /> Inserir coluna
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleDeleteStage(stage.id)}
+                        className="text-destructive focus:text-destructive"
+                        disabled={stages.length <= 1}
+                      >
+                        <Trash2 className="h-3.5 w-3.5 mr-2" /> Excluir coluna
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
 
