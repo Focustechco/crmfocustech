@@ -404,7 +404,6 @@ export function PipelinePage() {
   const [selectedResponsible, setSelectedResponsible] = useState<string>("all");
   const [selectedStageFilter, setSelectedStageFilter] = useState<string>("all");
   const [selectedPeriod, setSelectedPeriod] = useState<string>("30");
-  const [activeRibbonStage, setActiveRibbonStage] = useState<string>("stage-1");
 
   // Drag & Drop
   const [draggingDealId, setDraggingDealId] = useState<string | null>(null);
@@ -804,72 +803,7 @@ export function PipelinePage() {
         </div>
       </div>
 
-      {/* 2. Barra de Seção / Funil Minimalista e Compacta */}
-      <div className="flex items-center gap-1 overflow-x-auto p-1 bg-card/70 backdrop-blur-xs border border-border/70 rounded-xl shadow-2xs scrollbar-none">
-        {stages.map((stage, idx) => {
-          const stat = stageStats.get(stage.id) || { count: 0, totalValue: 0 };
-          const isActive = activeRibbonStage === stage.id;
-
-          return (
-            <div key={stage.id} className="flex items-center shrink-0">
-              <button
-                type="button"
-                onClick={() => {
-                  if (activeRibbonStage === stage.id) {
-                    setActiveRibbonStage(null);
-                    setSelectedStageFilter("all");
-                  } else {
-                    setActiveRibbonStage(stage.id);
-                    setSelectedStageFilter(stage.id);
-                  }
-                }}
-                className={cn(
-                  "flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs transition-all cursor-pointer border select-none",
-                  isActive
-                    ? "bg-[#FF6B00]/10 border-[#FF6B00]/30 text-foreground font-semibold shadow-2xs ring-1 ring-[#FF6B00]/20"
-                    : "border-transparent bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                )}
-                title={`${stage.name} - ${stat.count} negócios (${BRL(stat.totalValue)})`}
-              >
-                {/* Dot com a cor da etapa */}
-                <span
-                  className="h-2 w-2 rounded-full shrink-0 ring-1 ring-border/40"
-                  style={{ backgroundColor: stage.color }}
-                />
-
-                {/* Nome da Etapa */}
-                <span className={cn("font-medium truncate max-w-[130px]", isActive ? "text-foreground font-semibold" : "text-foreground/90")}>
-                  {stage.name}
-                </span>
-
-                {/* Contador */}
-                <span
-                  className={cn(
-                    "text-[10px] px-1.5 py-0.5 rounded-full font-medium leading-none",
-                    isActive
-                      ? "bg-[#FF6B00]/20 text-[#FF6B00]"
-                      : "bg-muted text-muted-foreground"
-                  )}
-                >
-                  {stat.count}
-                </span>
-
-                {/* Valor Total da Etapa */}
-                <span className={cn("text-[11px] font-semibold tracking-tight", isActive ? "text-[#FF6B00]" : "text-foreground/80")}>
-                  {BRL(stat.totalValue)}
-                </span>
-              </button>
-
-              {/* Conector sutil entre etapas */}
-              {idx < stages.length - 1 && (
-                <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/30 shrink-0 mx-0.5" />
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* 3. Colunas Kanban */}
+      {/* Colunas Kanban */}
       <div className="flex gap-4 overflow-x-auto pb-6 pt-1 items-start flex-1">
         {stages.map((stage) => {
           const stat = stageStats.get(stage.id) || { count: 0, totalValue: 0 };
